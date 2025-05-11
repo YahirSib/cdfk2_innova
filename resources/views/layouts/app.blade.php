@@ -14,7 +14,7 @@
         <!-- Menú de navegación -->
         <x-navbar />
         <!-- Contenido dinámico -->
-        <main class="p-4 sm:ml-64 mt-14 w-full sm:w-[calc(100vw-16rem)]">
+        <main class="p-4 sm:ml-64 mt-14 w-full sm:w-[calc(100vw-16rem)] bg-neutral-100">
             @yield('content')
         </main>
     </div>

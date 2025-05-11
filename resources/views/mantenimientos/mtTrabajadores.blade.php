@@ -3,7 +3,13 @@
 @section('title', 'Gestión de Trabajadores')
 
 @section('content')
+<!-- Meta tags para las rutas -->
 <meta name="datatable" content="{{ route('trabajadores.datatable') }}">
+<meta name="edit" content="{{ route('trabajadores.edit', ['id' => '__ID__']) }}">
+<meta name="delete" content="{{ route('trabajadores.delete', ['id' => '__ID__']) }}">
+<meta name="store" content="{{ route('trabajadores.store') }}">
+<meta name="update" content="{{ route('trabajadores.update')}}">
+
 <div class="container w-full p-4">
     <div class="w-full mb-4">
         <h1 class="text-2xl font-bold text-gray-800">Mantenimiento de Trabajadores</h1>
@@ -59,10 +65,15 @@
             </div>
             
             <!-- Botón Guardar -->
-            <div class="flex justify-center">
-                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+            <div class="flex justify-evenly items-center wrap ">
+                <button id="btnForm" type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-1">
                     Guardar
                 </button>
+
+                <button id="btnCrear" type="submit" class="hidden text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-1">
+                    Modo Creación
+                </button>
+
             </div>
         </form>
     </div>
@@ -71,13 +82,13 @@
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold text-gray-800 mb-4">Listado de Trabajadores</h2>
         <div class="relative overflow-x-auto">
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500" id="tblTrabajadores">
-                <thead>
+            <table class="min-w-full divide-y divide-gray-200 text-sm text-gray-700" id="tblTrabajadores">
+                <thead class="bg-gray-100">
                     <tr>
-                        <th>N°</th>
-                        <th>Nombre completo</th>
-                        <th>Tipo</th>
-                        <th>Acciones</th>
+                        <th class="px-4 py-2 text-left">N°</th>
+                        <th class="px-4 py-2 text-left">Nombre completo</th>
+                        <th class="px-4 py-2 text-left">Tipo</th>
+                        <th class="px-4 py-2 text-center">Acciones</th>
                     </tr>
                 </thead>
             </table>

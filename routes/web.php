@@ -10,11 +10,13 @@ Route::get('/', function () {
 
 Route::prefix('perfil')->group(function () {
     Route::get('/', [PerfilController::class, 'index'])->name('perfil.index');
-    // Otras rutas de usuarios...
 });
 
 Route::prefix('trabajadores')->group(function () {
     Route::get('/', [TrabajadoresController::class, 'index'])->name('trabajadores.index');
+    Route::get('/edit/{id}', [TrabajadoresController::class, 'edit'])->name('trabajadores.edit');
     Route::post('/', [TrabajadoresController::class, 'store'])->name('trabajadores.store');
     Route::get('/datatable', [TrabajadoresController::class, 'datatable'])->name('trabajadores.datatable');
+    Route::delete('/{id}', [TrabajadoresController::class, 'destroy'])->name('trabajadores.delete');
+    Route::put('/', [TrabajadoresController::class, 'update'])->name('trabajadores.update');
 });
