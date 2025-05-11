@@ -10,7 +10,7 @@
     </div>
     <!-- Formulario -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <form>
+        <form id="frmTrabajadores">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
                 <!-- Nombre del empleado-->
                 <div>
@@ -79,5 +79,5 @@
 @endsection
     
 @section('script')
-<script src="{{ asset('js/mantenimientos/mtTrabajadores.js') }}"></script>
+    @vite(['resources/js/mantenimientos/mtTrabajadores.js'])
 @endsection
