@@ -3,6 +3,7 @@
 @section('title', 'Gestión de Trabajadores')
 
 @section('content')
+<meta name="datatable" content="{{ route('trabajadores.datatable') }}">
 <div class="container w-full p-4">
     <div class="w-full mb-4">
         <h1 class="text-2xl font-bold text-gray-800">Mantenimiento de Trabajadores</h1>
@@ -10,35 +11,35 @@
     </div>
     <!-- Formulario -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <form id="frmTrabajadores">
+        <form id="frmTrabajadores" action="{{ route('trabajadores.store') }}" method="POST">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
                 <!-- Nombre del empleado-->
                 <div>
                     <label for="nombre1" class="block mb-2 text-sm font-medium text-gray-900">Primer Nombre <span class="text-red-500">(*)</span></label>
-                    <input type="text" id="nombre1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el primer nombre">
+                    <input type="text" id="nombre1" name="nombre1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el primer nombre">
                 </div>
                 <div>
                     <label for="nombre2" class="block mb-2 text-sm font-medium text-gray-900">Segundo Nombre</label>
-                    <input type="text" id="nombre2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el segundo nombre">
+                    <input type="text" id="nombre2" name="nombre2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el segundo nombre">
                 </div>
                 <div>
                     <label for="apellido1" class="block mb-2 text-sm font-medium text-gray-900">Primer apellido <span class="text-red-500">(*)</span> </label>
-                    <input type="text" id="apellido1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el primer apellido">
+                    <input type="text" id="apellido1" name="apellido1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el primer apellido">
                 </div>
                 <div>
                     <label for="apellido2" class="block mb-2 text-sm font-medium text-gray-900">Segundo apellido  </label>
-                    <input type="text" id="apellido2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el segundo apellido">
+                    <input type="text" id="apellido2" name="apellido2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el segundo apellido">
                 </div>
 
                 <div>
-                    <label for="edad" class="block mb-2 text-sm font-medium text-gray-900">Edad</label>
-                    <input type="number" id="edad" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese la edad">
+                    <label for="edad" class="block mb-2 text-sm font-medium text-gray-900">Edad <span class="text-red-500">(*)</span> </label>
+                    <input type="number" id="edad" name="edad" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese la edad">
                 </div>
                 
                 <!-- Tipo -->
                 <div>
-                    <label for="tipo" class="block mb-2 text-sm font-medium text-gray-900">Tipo</label>
-                    <select id="tipo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <label for="tipo" class="block mb-2 text-sm font-medium text-gray-900">Tipo <span class="text-red-500">(*)</span> </label>
+                    <select id="tipo" name="tipo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         <option value="0"> Seleccione una opción </option>
                         <option value="1">Tapicero</option>
                         <option value="2">Carpintero</option>
@@ -48,12 +49,12 @@
                 <!-- Dui -->
                 <div>
                     <label for="dui" class="block mb-2 text-sm font-medium text-gray-900">Dui</label>
-                    <input type="text" id="dui" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el dui">
+                    <input type="text" id="dui" name="dui" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el dui">
                 </div>
 
                 <div>
                     <label for="telefono" class="block mb-2 text-sm font-medium text-gray-900">Telefono</label>
-                    <input type="text" id="telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el telefono">
+                    <input type="text" id="telefono" name="telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el telefono">
                 </div>
             </div>
             
@@ -70,8 +71,15 @@
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold text-gray-800 mb-4">Listado de Trabajadores</h2>
         <div class="relative overflow-x-auto">
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-                
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500" id="tblTrabajadores">
+                <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th>Nombre completo</th>
+                        <th>Tipo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
             </table>
         </div>
     </div>

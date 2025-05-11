@@ -14,10 +14,14 @@
         "vite": "^6.2.4"
     },
     "dependencies": {
+        "@popperjs/core": "^2.11.8",
+        "bootbox": "^6.0.3",
+        "bootstrap": "^5.3.6",
         "boxicons": "^2.1.4",
         "datatables.net": "^2.3.0",
         "datatables.net-dt": "^2.3.0",
         "flowbite": "^3.1.2",
-        "jquery": "^3.7.1"
+        "jquery": "^3.7.1",
+        "sweetalert2": "^11.21.0"
     }
 }

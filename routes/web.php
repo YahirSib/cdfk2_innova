@@ -15,5 +15,6 @@ Route::prefix('perfil')->group(function () {
 
 Route::prefix('trabajadores')->group(function () {
     Route::get('/', [TrabajadoresController::class, 'index'])->name('trabajadores.index');
-    // Otras rutas de usuarios...
+    Route::post('/', [TrabajadoresController::class, 'store'])->name('trabajadores.store');
+    Route::get('/datatable', [TrabajadoresController::class, 'datatable'])->name('trabajadores.datatable');
 });
