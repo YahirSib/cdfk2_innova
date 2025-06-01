@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\TrabajadoresController;
 use App\Http\Controllers\PiezasController;
+use App\Http\Controllers\SalasController;
 
 Route::get('/', function () {
     return view('index');
@@ -30,4 +31,15 @@ Route::prefix('piezas')->group(function () {
     Route::delete('/{id}', [PiezasController::class, 'destroy'])->name('piezas.delete');
     Route::put('/', [PiezasController::class, 'update'])->name('piezas.update');
 });
+
+Route::prefix('salas')->group(function () {
+    Route::get('/', [SalasController::class, 'index'])->name('salas.index');
+    Route::get('/edit/{id}', [SalasController::class, 'edit'])->name('salas.edit');
+    Route::post('/', [SalasController::class, 'store'])->name('salas.store');
+    Route::get('/datatable', [SalasController::class, 'datatable'])->name('salas.datatable');
+    Route::delete('/{id}', [SalasController::class, 'destroy'])->name('salas.delete');
+    Route::put('/', [SalasController::class, 'update'])->name('salas.update');
+    Route::post('/getPiezas', [SalasController::class, 'getPiezas'])->name('salas.getPiezas');
+});
+
 

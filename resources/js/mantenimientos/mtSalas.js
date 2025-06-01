@@ -1,14 +1,16 @@
 import Swal from "sweetalert2";
+import 'jquery-ui-dist/jquery-ui.js';
+import 'jquery-ui-dist/jquery-ui.css';
 
 $(function() {
 
     function limpiarFormulario() {
-        $('#frmPiezas')[0].reset();
-        $('#tblPiezas').DataTable().ajax.reload();
+        $('#frmSalas')[0].reset();
+        $('#tblSalas').DataTable().ajax.reload();
     }
     
-    //Guardado o edicion de piezas
-    $('#frmPiezas').on('submit', function(e) {
+    //Guardado o edicion de salas
+    $('#frmSalas').on('submit', function(e) {
         e.preventDefault();
         var method = $(this).attr('method');
         var action = $(this).attr('action');
@@ -17,7 +19,7 @@ $(function() {
         //CUANDO EL METODO ES PUT SE ACTUALIZA EL TRABAJADOR
         if(method == 'PUT'){
             Swal.fire({
-                title: '¿Está seguro de actualizar la pieza?',
+                title: '¿Está seguro de actualizar la sala?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -26,7 +28,7 @@ $(function() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     //SI CONFIRMA SE ENVIA EL FORMULARIO
-                    formData.append('id_pieza', $('#frmPiezas').attr('data_id'));
+                    formData.append('id_salas', $('#frmSalas').attr('data_id'));
                     $.ajax({
                         url: action,
                         type: 'POST',
@@ -37,7 +39,7 @@ $(function() {
                             if(response.success) {
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'Pieza actualizada',
+                                    title: 'Sala actualizada',
                                     text: response.message,
                                     showConfirmButton: true,
                                     timer: 1500
@@ -97,7 +99,7 @@ $(function() {
                 if(response.success) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Pieza guardada',
+                            title: 'Sala guardada',
                             text: response.message,
                             showConfirmButton: true,
                             timer: 1500
@@ -149,7 +151,7 @@ $(function() {
         let baseDeleteUrl = $('meta[name="delete"]').attr('content');
         let finalUrl = baseDeleteUrl.replace('__ID__', id);
         Swal.fire({
-            title: '¿Está seguro de eliminar la pieza?',
+            title: '¿Está seguro de eliminar la sala?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -164,7 +166,7 @@ $(function() {
                         if(response.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Pieza eliminada',
+                                title: 'Sala eliminada',
                                 text: response.message,
                                 showConfirmButton: true,
                                 timer: 1500
@@ -203,8 +205,8 @@ $(function() {
         );
     });
 
-    //cargar tabla de piezas
-    $('#tblPiezas').DataTable({
+    //cargar tabla de salas
+    $('#tblSalas').DataTable({
         processing: true,
         serverSide: true,
         searching: true,
@@ -223,7 +225,7 @@ $(function() {
             search: "" // Oculta el texto "Search"
         },
         columns: [
-            { data: 'id_pieza' },
+            { data: 'id_salas' },
             { data: 'codigo' },
             { data: 'nombre' },
             { data: 'estado', render: function(data, type, row) {
@@ -279,9 +281,9 @@ $(function() {
                     $('#descripcion').val(response.data.descripcion);
 
                     //Cambio form para editar
-                    $('#frmPiezas').attr('action', $('meta[name="update"]').attr('content'));
-                    $('#frmPiezas').attr('data_id', id);
-                    $('#frmPiezas').attr('method', 'PUT');
+                    $('#frmSalas').attr('action', $('meta[name="update"]').attr('content'));
+                    $('#frmSalas').attr('data_id', id);
+                    $('#frmSalas').attr('method', 'PUT');
                     $('#btnForm').html('Actualizar');
                     $('#btnCrear').removeClass('hidden');
 
@@ -317,9 +319,9 @@ $(function() {
 
     $("#btnCrear").on('click', function(e) {
         e.preventDefault();
-        $('#frmPiezas').attr('action', $('meta[name="store"]').attr('content'));
-        $('#frmPiezas').attr('method', 'POST');
-        $('#frmPiezas').removeAttr('data_id');
+        $('#frmSalas').attr('action', $('meta[name="store"]').attr('content'));
+        $('#frmSalas').attr('method', 'POST');
+        $('#frmSalas').removeAttr('data_id');
         $('#btnForm').html('Guardar');
         $('#btnCrear').addClass('hidden');
         $('#codigo').focus();
@@ -337,18 +339,18 @@ $(function() {
             type: 'GET',
             success: function(response) {
                 if (response.success) {
-                    const pieza = response.data;
-                    const estadoTexto = pieza.estado == 1 ? 'Activo' : pieza.tipo == 2 ? 'Inactivo' : 'Desconocido';
+                    const sala = response.data;
+                    const estadoTexto = sala.estado == 1 ? 'Activo' : sala.tipo == 2 ? 'Inactivo' : 'Desconocido';
 
                     Swal.fire({
-                        title: '<strong>Información del la Pieza</strong>',
+                        title: '<strong>Información del la Sala</strong>',
                         html: `
                             <div class="text-left">
-                                <p class="p-1"><strong>Pieza:</strong> ${pieza.codigo} | ${pieza.nombre} </p>
+                                <p class="p-1"><strong>Sala:</strong> ${sala.codigo} | ${sala.nombre} </p>
                                 <p class="p-1"><strong>Estado:</strong> ${estadoTexto}</p>
-                                <p class="p-1"><strong>Costo Tapicero:</strong> ${pieza.costo_tapicero ?? 'N/A'}</p>
-                                <p class="p-1"><strong>Costo Cacastero:</strong> ${pieza.costo_cacastero ?? 'N/A'}</p>
-                                <p class="p-1"><strong>Descipción:</strong> ${pieza.descripcion ?? 'N/A'}</p>
+                                <p class="p-1"><strong>Costo Tapicero:</strong> ${sala.costo_tapicero ?? 'N/A'}</p>
+                                <p class="p-1"><strong>Costo Cacastero:</strong> ${sala.costo_cacastero ?? 'N/A'}</p>
+                                <p class="p-1"><strong>Descipción:</strong> ${sala.descripcion ?? 'N/A'}</p>
                             </div>
                         `,
                         showCloseButton: true,
@@ -364,7 +366,93 @@ $(function() {
                 }
             },
             error: function(xhr) {
-                Swal.fire('Error', 'No se pudo obtener la información del la pieza.', 'error');
+                Swal.fire('Error', 'No se pudo obtener la información del la sala.', 'error');
+            }
+        });
+    });
+
+
+    $(document).on('click', '#btn_settings', function () {
+        const id = $(this).attr('data_id');
+        // let baseEditUrl = $('meta[name="piezas_sala"]').attr('content');
+        // let finalUrl = baseEditUrl.replace('__ID__', id);
+
+            Swal.fire({
+            title: '<strong>Conformación de Piezas</strong>',
+            html: `
+                <form class="grid grid-cols-2 gap-2" id="frmPiezaSala" method="POST" action="" class="mb-4">
+                    <div>
+                        <label for="pieza_sala" class="block mb-2 text-sm font-medium text-gray-900">Pieza<span class="text-red-500">(*)</span> </label>
+                        <input type="text" id="pieza_sala" name="pieza_sala" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Buscar pieza">
+                    </div>
+
+                    <div>
+                        <label for="cantidad" class="block mb-2 text-sm font-medium text-gray-900">Cantidad<span class="text-red-500">(*)</span> </label>
+                        <input type="text" id="cantidad" name="cantidad" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese la cantidad de piezas">
+                    </div>
+                </form>
+
+                <div class="text-left mt-4">
+                    <div id="conformacion_piezas" class="overflow-y-auto max-h-60">
+                        <table class="table-auto w-full">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2">Código</th>
+                                    <th class="px-4 py-2">Nombre</th>
+                                    <th class="px-4 py-2">Cantidad</th>
+                                    <th class="px-4 py-2">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="piezas_table_body">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            showCloseButton: true,
+            showConfirmButton: false,
+            focusConfirm: false,
+            customClass: {
+                popup: 'rounded-xl p-6'
+            },
+            width: '95%',
+            didOpen: () => {
+                // Inicializar autocomplete cuando el modal está abierto
+                console.log('Modal abierto, inicializando autocomplete');
+                $('#pieza_sala').autocomplete({
+                    source: function(request, response) {
+                        $.ajax({
+                            url: $('meta[name="piezas"]').attr('content'),
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                val: request.term
+                            },
+                            success: function(data) {
+                                console.log(data); // Verifica qué llega
+                                response($.map(data, function(item) {
+                                    return {
+                                        label: item.text,
+                                        value: item.text,
+                                        id_piezas: item.id
+                                    };
+                                }));
+                            }
+                        });
+                    },
+                    minLength: 2,
+                    select: function(event, ui) {
+                        $(this).val(ui.item.value);
+                        $(this).attr('data_id', ui.item.id_piezas);
+                        return false;
+                    },
+                    focus: function(event, ui) {
+                        $(this).val(ui.item.label);
+                        return false;
+                    }
+                });
+                $('.ui-autocomplete').css('z-index', 2000);
             }
         });
     });

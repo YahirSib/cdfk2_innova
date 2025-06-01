@@ -6,6 +6,7 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@rollup/plugin-inject": "^5.0.5",
         "@tailwindcss/vite": "^4.1.5",
         "axios": "^1.8.2",
         "concurrently": "^9.0.1",
@@ -15,13 +16,17 @@
     },
     "dependencies": {
         "@popperjs/core": "^2.11.8",
+        "@types/select2": "^4.0.63",
         "bootbox": "^6.0.3",
         "bootstrap": "^5.3.6",
         "boxicons": "^2.1.4",
-        "datatables.net": "^2.3.0",
-        "datatables.net-dt": "^2.3.0",
+        "datatables.net": "^2.3.1",
+        "datatables.net-dt": "^2.3.1",
         "flowbite": "^3.1.2",
         "jquery": "^3.7.1",
+        "jquery-ui": "^1.14.1",
+        "jquery-ui-dist": "^1.13.3",
+        "select2": "^4.1.0-rc.0",
         "sweetalert2": "^11.21.0"
     }
 }

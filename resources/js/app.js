@@ -1,5 +1,6 @@
-import jQuery from 'jquery';
-window.$ = jQuery;
+import $ from 'jquery';
+window.$ = $;
+window.jQuery = $;
 
 import 'bootstrap';
 import Swal from 'sweetalert2';
