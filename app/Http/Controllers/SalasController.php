@@ -136,6 +136,12 @@ class SalasController extends Controller
             return response()->json(['success' => false, 'message' => 'Sala no encontrada.']);
         }
 
+        $validar = DB::table('salas_piezas')->select('id_relacion')->where('id_sala', $salas->id_salas)->first();
+
+        if($validar) {
+            return response()->json(['success' => false, 'message' => 'No se puede eliminar la sala porque tiene piezas asociadas.']);
+        }
+
         try {
             DB::beginTransaction();
             $salas->delete();

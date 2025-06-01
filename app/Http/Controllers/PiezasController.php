@@ -127,6 +127,14 @@ class PiezasController extends Controller
             return response()->json(['success' => false, 'message' => 'Pieza no encontrada.']);
         }
 
+        $validacion = DB::table('salas_piezas')
+            ->where('id_pieza', $pieza->id_pieza)
+            ->exists();
+            
+        if ($validacion) {
+            return response()->json(['success' => false, 'message' => 'No se puede eliminar la pieza porque está asociada a una sala.']);
+        }
+
         if ($pieza->delete()) {
             return response()->json(['success' => true, 'message' => 'Pieza eliminada exitosamente.']);
         } else {
