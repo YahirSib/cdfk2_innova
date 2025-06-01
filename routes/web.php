@@ -40,6 +40,10 @@ Route::prefix('salas')->group(function () {
     Route::delete('/{id}', [SalasController::class, 'destroy'])->name('salas.delete');
     Route::put('/', [SalasController::class, 'update'])->name('salas.update');
     Route::post('/getPiezas', [SalasController::class, 'getPiezas'])->name('salas.getPiezas');
+    Route::post('/savePiezas', [SalasController::class, 'savePiezas'])->name('salas.savePiezas');
+    Route::post('/getPiezasBySala', [SalasController::class, 'getPiezasBySala'])->name('salas.getPiezasBySala');
+    Route::delete('/deletePiezaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
+    Route::put('/updatePiezaBySala', [SalasController::class, 'updatePiezaBySala'])->name('salas.updatePiezaBySala');
 });
 
 

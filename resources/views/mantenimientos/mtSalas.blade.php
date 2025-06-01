@@ -10,6 +10,10 @@
 <meta name="store" content="{{ route('salas.store') }}">
 <meta name="update" content="{{ route('salas.update')}}">
 <meta name="piezas" content="{{ route('salas.getPiezas') }}">
+<meta name="store_pieza" content="{{ route('salas.savePiezas') }}">
+<meta name="piezas_sala" content="{{ route('salas.getPiezasBySala') }}">
+<meta name="delete_pieza" content="{{ route('salas.deletePiezaBySala', ['id' => '__ID__']) }}">
+<meta name="update_pieza" content="{{ route('salas.updatePiezaBySala')}}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4">

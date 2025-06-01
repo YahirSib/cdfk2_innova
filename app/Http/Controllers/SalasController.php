@@ -167,7 +167,7 @@ class SalasController extends Controller
                 
                 <button id="btn_ver" data_id="'.$sala->id_salas.'" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-blue-600 hover:text-blue-400 bx bxs-info-circle bx-rotate-180"></i>  </button>
 
-                <button id="btn_settings" data_id="'.$sala->id_salas.'" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-gray-600 hover:text-gray-400 bx bxs-cog bx-rotate-180"></i>  </button>
+                <button id="btn_settings" data_id="'.$sala->id_salas.'" data_sala="'.$sala->nombre.'" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-gray-600 hover:text-gray-400 bx bxs-cog bx-rotate-180"></i>  </button>
             </div>';
             })->rawColumns(['acciones'])
             ->toJson();
@@ -175,7 +175,7 @@ class SalasController extends Controller
 
     public function getPiezas(Request $request)
     {
-        $term = $request->input('term');
+        $term = $request->val;
         $piezas = DB::table('piezas')
             ->select('id_pieza as id', 'codigo', 'nombre')
             ->where('codigo', 'like', "%{$term}%")
@@ -189,6 +189,101 @@ class SalasController extends Controller
             });
 
         return response()->json($piezas);
+    }
+
+    public function savePiezas(Request $request)
+    {
+
+        $salas = Salas::find($request->id_sala);
+        if (!$salas) {
+            return response()->json(['success' => false, 'message' => 'Sala no encontrada.']);
+        }
+
+        $piezas = $request->id_pieza;
+        if (empty($piezas)) {
+            return response()->json(['success' => false, 'message' => 'Debe seleccionar al menos una pieza.']);
+        }
+
+        $cantidad = $request->cantidad;
+        if(empty($cantidad) || !is_numeric($cantidad) || $cantidad <= 0) {
+            return response()->json(['success' => false, 'message' => 'La cantidad debe ser un número mayor a 0.']);
+        }
+
+        $validacion = DB::table('salas_piezas')->select('id_relacion')->where('id_sala', $salas->id_salas)->where('id_pieza', $request->id_pieza);
+
+        if(!empty($validacion->first())) {
+            return response()->json(['success' => false, 'message' => 'La pieza ya se encuentra registrada en la sala.']);
+        }
+
+        try {
+            DB::beginTransaction();
+            DB::table('salas_piezas')->insert([
+                'id_sala' => $salas->id_salas,
+                'id_pieza' => $piezas,
+                'cantidad' => $cantidad
+            ]);
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Piezas guardadas correctamente.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al guardar las piezas.']);
+        }
+    }
+
+    public function getPiezasBySala(Request $request)
+    {
+        $id_sala = $request->id_sala;
+        $piezas = DB::table('salas_piezas')
+            ->join('piezas', 'salas_piezas.id_pieza', '=', 'piezas.id_pieza')
+            ->select('salas_piezas.id_relacion', 'piezas.codigo' , 'piezas.nombre', 'salas_piezas.cantidad')
+            ->where('salas_piezas.id_sala', $id_sala)
+            ->get();
+
+        if($piezas->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No se encontraron piezas para esta sala.']);
+        }else{
+            return response()->json(['success' => true, 'data' => $piezas]);
+        }
+    }
+
+    public function deletePiezaBySala($id)
+    {
+        $id_relacion = $id;
+        $pieza = DB::table('salas_piezas')->where('id_relacion', $id_relacion)->first();
+
+        if (!$pieza) {
+            return response()->json(['success' => false, 'message' => 'Pieza no encontrada en la sala.']);
+        }
+
+        try {
+            DB::beginTransaction();
+            DB::table('salas_piezas')->where('id_relacion', $id_relacion)->delete();
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Pieza eliminada correctamente de la sala.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al eliminar la pieza de la sala.']);
+        }
+    }
+
+    public function updatePiezaBySala(Request $request)
+    {
+        $id_relacion = $request->id_relacion;
+        $cantidad = $request->cantidad;
+
+        if(empty($cantidad) || !is_numeric($cantidad) || $cantidad <= 0) {
+            return response()->json(['success' => false, 'message' => 'La cantidad debe ser un número mayor a 0.']);
+        }
+
+        try {
+            DB::beginTransaction();
+            DB::table('salas_piezas')->where('id_relacion', $id_relacion)->update(['cantidad' => $cantidad]);
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Cantidad actualizada correctamente.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al actualizar la cantidad de la pieza en la sala.']);
+        }
     }
 
 

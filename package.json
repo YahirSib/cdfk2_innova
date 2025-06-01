@@ -26,6 +26,7 @@
         "jquery": "^3.7.1",
         "jquery-ui": "^1.14.1",
         "jquery-ui-dist": "^1.13.3",
+        "notyf": "^3.10.0",
         "select2": "^4.1.0-rc.0",
         "sweetalert2": "^11.21.0"
     }

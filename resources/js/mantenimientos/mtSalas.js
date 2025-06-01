@@ -1,6 +1,8 @@
 import Swal from "sweetalert2";
 import 'jquery-ui-dist/jquery-ui.js';
 import 'jquery-ui-dist/jquery-ui.css';
+import notyf from '../../js/app.js';
+
 
 $(function() {
 
@@ -66,7 +68,6 @@ $(function() {
                                 });
                                 responseText = errorMessage;
                             } else if (xhr.status === 500) {
-                                console.log(xhr);
                                 if(xhr.responseJSON.message){
                                     responseText = xhr.responseJSON.message;
                                 }else{
@@ -126,7 +127,6 @@ $(function() {
                         });
                         responseText = errorMessage;
                     } else if (xhr.status === 500) {
-                        console.log(xhr);
                         if(xhr.responseJSON.message){
                             responseText = xhr.responseJSON.message;
                         }else{
@@ -185,7 +185,6 @@ $(function() {
                         // Manejo de errores
                         var responseText = xhr.responseText;
                         if (xhr.status === 500) {
-                            console.log(xhr);
                             if(xhr.responseJSON.message){
                                 responseText = xhr.responseJSON.message;
                             }else{
@@ -255,7 +254,7 @@ $(function() {
     });
 
 
-        
+    //cargar informacion de la sala al hacer click en el boton editar    
     $(document).on('click', '#btn_editar', function(e) {
         e.preventDefault();
         
@@ -267,7 +266,6 @@ $(function() {
             url: finalUrl, 
             type: 'GET',
             success: function(response) {
-                console.log(response);
                 if (response.success) {
 
                     //Cargar datos en el formulario
@@ -300,7 +298,6 @@ $(function() {
                 // Manejo de errores
                 var responseText = xhr.responseText;
                 if (xhr.status === 500) {
-                    console.log(xhr);
                     if(xhr.responseJSON.message){
                         responseText = xhr.responseJSON.message;
                     }else{
@@ -329,7 +326,7 @@ $(function() {
         limpiarFormulario();
     }); 
 
-
+    //modal con datos de la sala general
     $(document).on('click', '#btn_ver', function () {
         const id = $(this).attr('data_id');
         let baseEditUrl = $('meta[name="edit"]').attr('content');
@@ -371,36 +368,40 @@ $(function() {
         });
     });
 
-
+    //modal para conformación de piezas
     $(document).on('click', '#btn_settings', function () {
         const id = $(this).attr('data_id');
-        // let baseEditUrl = $('meta[name="piezas_sala"]').attr('content');
-        // let finalUrl = baseEditUrl.replace('__ID__', id);
-
+        const sala = $(this).attr('data_sala');
             Swal.fire({
-            title: '<strong>Conformación de Piezas</strong>',
+            title: '<strong>Conformación de Piezas <br> Sala: '+sala+'</strong>',
             html: `
-                <form class="grid grid-cols-2 gap-2" id="frmPiezaSala" method="POST" action="" class="mb-4">
-                    <div>
-                        <label for="pieza_sala" class="block mb-2 text-sm font-medium text-gray-900">Pieza<span class="text-red-500">(*)</span> </label>
+                <form class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-10 gap-2 bg-white p-6 rounded-lg shadow-md mb-8" id="frmPiezaSala" data-id = ${id} method="POST" action="" class="mb-4">
+                    <div class="md:col-span-2 lg:col-span-4" mb-2>
+                        <label for="pieza_sala" class="block mb-2  md:text-left lg:text-center text-sm font-medium text-gray-900">Pieza<span class="text-red-500">(*)</span> </label>
                         <input type="text" id="pieza_sala" name="pieza_sala" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Buscar pieza">
                     </div>
 
-                    <div>
-                        <label for="cantidad" class="block mb-2 text-sm font-medium text-gray-900">Cantidad<span class="text-red-500">(*)</span> </label>
+                    <div class="md:col-span-2 lg:col-span-4 mb-2">
+                        <label for="cantidad" class="block mb-2 text-sm md:text-left lg:text-center font-medium text-gray-900">Cantidad<span class="text-red-500">(*)</span> </label>
                         <input type="text" id="cantidad" name="cantidad" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese la cantidad de piezas">
                     </div>
+
+                    <div class="w-full flex items-center justify-center md:col-span-5 lg:col-span-2 mb-2">
+                        <button id="btnGuardarPieza" type="submit" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-2xl w-full px-5 py-2.5 text-center m-1 h-full">
+                            +
+                        </button>
+                    </div>
+
                 </form>
 
-                <div class="text-left mt-4">
+                <div class="text-left mt-4 mb-2 bg-white p-6 rounded-lg shadow-md mb-8">
                     <div id="conformacion_piezas" class="overflow-y-auto max-h-60">
-                        <table class="table-auto w-full">
+                        <table class="table-auto w-lg sm:w-full p-3">
                             <thead>
                                 <tr>
-                                    <th class="px-4 py-2">Código</th>
-                                    <th class="px-4 py-2">Nombre</th>
-                                    <th class="px-4 py-2">Cantidad</th>
-                                    <th class="px-4 py-2">Acciones</th>
+                                    <th class="px-2 py-2">Pieza</th>
+                                    <th class="px-2 py-2">Cantidad</th>
+                                    <th class="px-2 py-2"></th>
                                 </tr>
                             </thead>
                             <tbody id="piezas_table_body">
@@ -414,12 +415,11 @@ $(function() {
             showConfirmButton: false,
             focusConfirm: false,
             customClass: {
-                popup: 'rounded-xl p-6'
+                popup: 'rounded-xl p-6 !bg-neutral-100'
             },
             width: '95%',
             didOpen: () => {
-                // Inicializar autocomplete cuando el modal está abierto
-                console.log('Modal abierto, inicializando autocomplete');
+                cargarPiezas(id);
                 $('#pieza_sala').autocomplete({
                     source: function(request, response) {
                         $.ajax({
@@ -430,7 +430,6 @@ $(function() {
                                 val: request.term
                             },
                             success: function(data) {
-                                console.log(data); // Verifica qué llega
                                 response($.map(data, function(item) {
                                     return {
                                         label: item.text,
@@ -444,7 +443,7 @@ $(function() {
                     minLength: 2,
                     select: function(event, ui) {
                         $(this).val(ui.item.value);
-                        $(this).attr('data_id', ui.item.id_piezas);
+                        $(this).attr('data-id', ui.item.id_piezas);
                         return false;
                     },
                     focus: function(event, ui) {
@@ -456,4 +455,207 @@ $(function() {
             }
         });
     });
+
+
+    //guardado de la pieza para la sala
+
+    $(document).on('submit', '#frmPiezaSala', function(e) {
+        e.preventDefault();
+        var idSala = $('#frmPiezaSala').attr('data-id');
+        var id_pieza = $('#pieza_sala').attr('data-id');
+        var cantidad = $('#cantidad').val();
+        $.ajax({
+            url: $('meta[name="store_pieza"]').attr('content'),
+            type: 'POST',
+            data: {
+                id_sala: idSala,
+                id_pieza: id_pieza,
+                cantidad: cantidad
+            },
+            success: function(response) {
+                if(response.success) {
+                    cargarPiezas(idSala);
+                    notyf.success(response.message);
+                    $('#frmPiezaSala')[0].reset();
+                    $('#pieza_sala').removeAttr('data-id');
+                }else{
+                    notyf.error(response.message);
+                }
+            },error: function(xhr, status, error) {
+                // Manejo de errores
+                var responseText = xhr.responseText;
+                if (xhr.status === 422) {
+                    // Validación fallida
+                    var errors = JSON.parse(responseText);
+                    var errorMessage = '';
+                    $.each(errors.errors, function(key, value) {
+                        errorMessage += value[0] + "<br>";
+                    });
+                    responseText = errorMessage;
+                } else if (xhr.status === 500) {
+                    if(xhr.responseJSON.message){
+                        responseText = xhr.responseJSON.message;
+                    }else{
+                        responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                    }
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: responseText,
+                    showConfirmButton: true,
+                });
+            }
+        });
+    }
+    );
+
+    //cargar piezas de la sala
+
+    function cargarPiezas(id_sala){
+        $.ajax({
+            url: $('meta[name="piezas_sala"]').attr('content'),
+            type: 'POST',
+            data: {
+                id_sala: id_sala
+            },
+            success: function(response) {
+                $('#piezas_table_body').empty();
+                if(response.success) {
+                    response.data.forEach(function(item) {
+                        $('#piezas_table_body').append(`
+                            <tr>
+                                <td class="px-2 py-1"> ${item.codigo} | ${item.nombre}</td>
+                                <td class="px-2 py-1">  
+                                    <input type="number" class="txtCantidad bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value="${item.cantidad}" data-id=${item.id_relacion} data-last="${item.cantidad}">
+                                </td>
+                                <td class="px-2 py-1">
+                                   <button id="btn_eliminar_pieza" data-id="${item.id_relacion}" class="btn btn-sm btn-danger cursor-pointer"><i class=" text-2xl text-red-600 hover:text-red-400 bx bxs-trash"></i></button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }else{
+                    ('#piezas_table_body').append(`
+                            <tr>
+                                <td col-span="3" class="px-2 py-2"> No existen piezas relacionadas.</td>
+                            </tr>
+                    `);
+                }
+            },error: function(xhr, status, error) {
+                // Manejo de errores
+                var responseText = xhr.responseText;
+                if (xhr.status === 500) {
+                    if(xhr.responseJSON.message){
+                        responseText = xhr.responseJSON.message;
+                    }else{
+                        responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                    }
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: responseText,
+                    showConfirmButton: true,
+                });
+            }
+        });
+    }
+
+    $(document).on('click', '#btn_eliminar_pieza', function(e) {
+        e.preventDefault();
+        console.log('Eliminando pieza de la sala');
+        var id = $(this).attr('data-id');
+        let baseEditUrl = $('meta[name="delete_pieza"]').attr('content');
+        let finalUrl = baseEditUrl.replace('__ID__', id);
+        Swal.fire({
+            title: '¿Está seguro de eliminar la pieza de la sala?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Eliminar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: finalUrl,
+                    type: 'DELETE',
+                    success: function(response) {
+                        if(response.success) {
+                            cargarPiezas($('#frmPiezaSala').attr('data-id'));
+                            notyf.success(response.message);
+                        }else{
+                            notyf.error(response.message);
+                        }
+                    },error: function(xhr, status, error) {
+                        // Manejo de errores
+                        var responseText = xhr.responseText;
+                        if (xhr.status === 500) {
+                            if(xhr.responseJSON.message){
+                                responseText = xhr.responseJSON.message;
+                            }else{
+                                responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                            }
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            html: responseText,
+                            showConfirmButton: true,
+                        });
+                    }
+                });
+            }
+        });
+    }
+    );
+
+    $(document).on('change', '.txtCantidad', function(e) {
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        var cantidad = $(this).val();
+        var lastCantidad = $(this).attr('data-last');
+        $.ajax({
+            url: $('meta[name="update_pieza"]').attr('content'),
+            type: 'PUT',
+            data: {
+                id_relacion: id,
+                cantidad: cantidad
+            },
+            success: function(response) {
+                if(response.success) {
+                    notyf.success(response.message);
+                }else{
+                    notyf.error(response.message);
+                    $(`.txtCantidad[data-id="${id}"]`).val(lastCantidad);
+                }
+            },error: function(xhr, status, error) {
+                // Manejo de errores
+                var responseText = xhr.responseText;
+                if (xhr.status === 422) {
+                    // Validación fallida
+                    var errors = JSON.parse(responseText);
+                    var errorMessage = '';
+                    $.each(errors.errors, function(key, value) {
+                        errorMessage += value[0] + "<br>";
+                    });
+                    responseText = errorMessage;
+                } else if (xhr.status === 500) {
+                    if(xhr.responseJSON.message){
+                        responseText = xhr.responseJSON.message;
+                    }else{
+                        responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                    }
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: responseText,
+                    showConfirmButton: true,
+                });
+            }
+        });
+    }
+    );
+
 });
