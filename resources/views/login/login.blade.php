@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'INDEX')
+@section('title', 'Gestión de Perfiles')
 
 @section('content')
-    <h1>BIENVENIDO</h1>
-    
+
 @endsection
