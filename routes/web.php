@@ -49,9 +49,9 @@ Route::prefix('salas')->group(function () {
 Route::prefix('nota-pieza')->group(function () {
     Route::get('/', [App\Http\Controllers\NotaPiezaController::class, 'index'])->name('nota-pieza.index');
     Route::get('/create', [App\Http\Controllers\NotaPiezaController::class, 'create'])->name('nota-pieza.create');
-    // Route::post('/store', [App\Http\Controllers\NotaPiezaController::class, 'store'])->name('nota-pieza.store');
+    Route::post('/', [App\Http\Controllers\NotaPiezaController::class, 'store'])->name('nota-pieza.store');
     // Route::get('/datatable', [App\Http\Controllers\NotaPiezaController::class, 'datatable'])->name('nota-pieza.datatable');
-    // Route::get('/edit/{id}', [App\Http\Controllers\NotaPiezaController::class, 'edit'])->name('nota-pieza.edit');
+    Route::get('/edit/{id}', [App\Http\Controllers\NotaPiezaController::class, 'edit'])->name('nota-pieza.edit');
     // Route::put('/update', [App\Http\Controllers\NotaPiezaController::class, 'update'])->name('nota-pieza.update');
     // Route::delete('/{id}', [App\Http\Controllers\NotaPiezaController::class, 'destroy'])->name('nota-pieza.delete');
 });
