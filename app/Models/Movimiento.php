@@ -21,7 +21,8 @@ class Movimiento extends Model
         'comentario',
         'estado',
         'correlativo',
-        'fecha_impresion'
+        'fecha_impresion',
+        'fecha_anulacion'
     ];
 
     public function detalles()

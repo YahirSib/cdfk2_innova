@@ -119,8 +119,11 @@ class NotaPiezaController extends Controller
                 if($notaPieza->estado == 'A') {
                     $html .= '<a data-id="'.$notaPieza->id_movimiento.'" href ="'. route('nota-pieza.edit', ['id' => $notaPieza->id_movimiento]) .'" class="btn_editar btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-yellow-600 hover:text-yellow-400 bx bxs-edit"></i></a>';
                     $html .= '<button data-id="'.$notaPieza->id_movimiento.'" class="btn_eliminar btn btn-sm btn-danger cursor-pointer"><i class=" text-2xl text-red-600 hover:text-red-400 bx bxs-trash"></i></button>';
+                }else if($notaPieza->estado == "I"){
+                    $html .= '<a data-id="'.$notaPieza->id_movimiento.'" data-estado="'.$notaPieza->estado.'" class="btnReporte btn btn-sm btn-primary cursor-pointer"><i class="bx bxs-file-pdf text-2xl text-blue-600 hover:text-blue-400"></i></a>';
+                    $html .= '<button data-id="'.$notaPieza->id_movimiento.'" class="btnAnular btn btn-sm btn-danger cursor-pointer"> <i class="bx bx-revision text-2xl text-red-600 hover:text-red-400"></i> </button>';
                 }else{
-
+                    $html .= '<a data-id="'.$notaPieza->id_movimiento.'" data-estado="'.$notaPieza->estado.'" class="btnReporte btn btn-sm btn-primary cursor-pointer"><i class="bx bxs-file-pdf text-2xl text-blue-600 hover:text-blue-400"></i></a>';
                 }
 
                 $html .= '</div>';
@@ -324,5 +327,63 @@ class NotaPiezaController extends Controller
 
         
     }
+
+    public function imprimirHistorico($id)
+    {
+        $data = [];
+        
+        $notaPieza = Movimiento::find($id);
+
+        if($notaPieza->estado == "I"){
+            $data['title'] = 'NOTA DE PIEZA HISTORICA';
+        }else{
+            $data['title'] = 'NOTA DE PIEZA ANULADA';
+        }
+
+        $data['notaPieza'] = $notaPieza;
+        $data['correlativo'] = $notaPieza->correlativo_formateado;
+        $data['fecha_ingreso'] = $notaPieza->fecha_ingreso_formateada;
+        $data['cacastero'] = $notaPieza->nombre_cacastero;
+        $detalles = $notaPieza->detalles()->with('pieza')->get();
+        $total = $notaPieza->totalizar();
+        $totalUnidades = $notaPieza->totalizarUnidades();
+        return $this->renderPDF($notaPieza, $detalles, $total, $totalUnidades, $data);
+    }
+
+    public function imprimirAnular($id)
+    {
+        try{
+            DB::beginTransaction();
+            $data = [];
+            $data['title'] = 'NOTA DE PIEZA ANULADA';
+            $notaPieza = Movimiento::find($id);
+            $data['notaPieza'] = $notaPieza;
+            $data['correlativo'] = $notaPieza->correlativo_formateado;
+            $data['fecha_ingreso'] = $notaPieza->fecha_ingreso_formateada;
+            $data['cacastero'] = $notaPieza->nombre_cacastero;
+            $detalles = $notaPieza->detalles()->with('pieza')->get();
+            $total = $notaPieza->totalizar();
+            $totalUnidades = $notaPieza->totalizarUnidades();
+
+            $notaPieza->estado = 'Z';
+            $notaPieza->fecha_anulacion = now(); 
+            $notaPieza->save();
+
+            foreach ($detalles as $detalle) {
+                $id_pieza = $detalle->fk_pieza;
+                $pieza = Pieza::find($id_pieza);
+                $pieza->existencia = $pieza->totalizarExistencias();
+                $pieza->save();
+            }
+
+            DB::commit();
+            return $this->renderPDF($notaPieza, $detalles, $total, $totalUnidades, $data);
+        }catch(\Exception $e){
+            DB::rollBack();
+            \Log::error('Error al generar PDF de Nota de Pieza: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al generar el PDF, contacte con Soporte Técnico.']);
+        }
+    }
+
 
 }

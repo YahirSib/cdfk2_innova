@@ -7,6 +7,8 @@
 <meta name="datatable" content="{{ route('nota-pieza.datatable') }}">
 <meta name="delete" content="{{ route('nota-pieza.delete', ['id' => '__ID__']) }}">
 <meta name="action" content = "ver">
+<meta name="print_historico" content="{{ route('nota-pieza.print_historico', ['id' => '__ID__']) }}">
+<meta name="print_anulada" content="{{ route('nota-pieza.print_anulada', ['id' => '__ID__']) }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4">

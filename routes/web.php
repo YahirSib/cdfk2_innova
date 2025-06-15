@@ -61,6 +61,8 @@ Route::prefix('nota-pieza')->group(function () {
     Route::delete('/{id}', [App\Http\Controllers\NotaPiezaController::class, 'destroy'])->name('nota-pieza.delete');
     Route::get('/print/{id}', [NotaPiezaController::class, 'imprimirPreliminar'])->name('nota-pieza.print_preliminar');
     Route::get('/print-final/{id}', [NotaPiezaController::class, 'imprimirFinal'])->name('nota-pieza.print_final');
+    Route::get('/print-historico/{id}', [NotaPiezaController::class, 'imprimirHistorico'])->name('nota-pieza.print_historico');
+    Route::get('/print-anulada/{id}', [NotaPiezaController::class, 'imprimirAnular'])->name('nota-pieza.print_anulada');
 });
 
 

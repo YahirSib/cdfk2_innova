@@ -202,7 +202,8 @@ $(function() {
             { data: 'fecha_ingreso' },
             { data: 'estado', render: function(data, type, row) {
                 if (data === "A") return 'Activo';
-                if (data === "X") return 'Impreso';
+                if (data === "I") return 'Impreso';
+                if (data === "Z") return 'Anulada';
                 return data;
             }},
             { data: 'acciones', orderable: false, searchable: false }
@@ -535,4 +536,38 @@ $(function() {
             }
         }); 
     });
+
+    $(document).on( 'click' ,'.btnReporte', function(e){
+        e.preventDefault();
+        
+        var estado = $(this).attr('data-estado');
+        var id = $(this).attr('data-id');
+
+        var basePrintUrl = $('meta[name="print_historico"]').attr('content');
+        let finalUrl = basePrintUrl.replace('__ID__', id);
+        window.open(finalUrl, '_blank');
+
+        
+    });
+
+    $(document).on('click', '.btnAnular', function(e){
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        Swal.fire({
+            title: '¿Está seguro de anular esta nota de pieza?',
+            text: 'Esta acción generará un documento PDF de anulación con los detalles de la nota que no se podra revertir.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Anular'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var basePrintUrl = $('meta[name="print_anulada"]').attr('content');
+                let finalUrl = basePrintUrl.replace('__ID__', id);
+                window.open(finalUrl, '_blank');
+            }
+        }); 
+    });
+
 });
