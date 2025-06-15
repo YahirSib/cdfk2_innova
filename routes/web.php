@@ -5,6 +5,7 @@ use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\TrabajadoresController;
 use App\Http\Controllers\PiezasController;
 use App\Http\Controllers\SalasController;
+use App\Http\Controllers\NotaPiezaController;
 
 Route::get('/', function () {
     return view('index');
@@ -47,14 +48,17 @@ Route::prefix('salas')->group(function () {
 });
 
 Route::prefix('nota-pieza')->group(function () {
-    Route::get('/', [App\Http\Controllers\NotaPiezaController::class, 'index'])->name('nota-pieza.index');
-    Route::get('/create', [App\Http\Controllers\NotaPiezaController::class, 'create'])->name('nota-pieza.create');
-    Route::post('/', [App\Http\Controllers\NotaPiezaController::class, 'store'])->name('nota-pieza.store');
-    // Route::get('/datatable', [App\Http\Controllers\NotaPiezaController::class, 'datatable'])->name('nota-pieza.datatable');
-    Route::get('/edit/{id}', [App\Http\Controllers\NotaPiezaController::class, 'edit'])->name('nota-pieza.edit');
-    // Route::put('/update', [App\Http\Controllers\NotaPiezaController::class, 'update'])->name('nota-pieza.update');
+    Route::get('/', [NotaPiezaController::class, 'index'])->name('nota-pieza.index');
+    Route::get('/create', [NotaPiezaController::class, 'create'])->name('nota-pieza.create');
+    Route::post('/', [NotaPiezaController::class, 'store'])->name('nota-pieza.store');
+    Route::get('/datatable', [NotaPiezaController::class, 'datatable'])->name('nota-pieza.datatable');
+    Route::get('/edit/{id}', [NotaPiezaController::class, 'edit'])->name('nota-pieza.edit');
+    Route::post('/update', [NotaPiezaController::class, 'update'])->name('nota-pieza.update');
+    Route::post('/savePiezas', [NotaPiezaController::class, 'guardarDetalle'])->name('nota-pieza.savePiezas');
+    Route::get('/getPiezas/{id}', [NotaPiezaController::class, 'cargarDetalles'])->name('nota-pieza.getPiezas');
     // Route::delete('/{id}', [App\Http\Controllers\NotaPiezaController::class, 'destroy'])->name('nota-pieza.delete');
 });
+
 
 
 

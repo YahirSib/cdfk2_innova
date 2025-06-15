@@ -4,6 +4,9 @@
 
 @section('content')
 
+<meta name="datatable" content="{{ route('nota-pieza.datatable') }}">
+<meta name="action" content = "ver">
+
 <div class="container w-full p-4">
     <div class="w-full mb-4">
         <h1 class="text-2xl font-bold text-gray-800">Nota de Pieza</h1>
@@ -37,4 +40,8 @@
 
 </div>
     
+@endsection
+
+@section('script')
+    @vite(['resources/js/movimientos/mvNotaPieza.js'])
 @endsection
