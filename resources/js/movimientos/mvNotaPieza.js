@@ -16,17 +16,19 @@ $(function() {
             type: 'GET',
             success: function(response) {
                 const detalles = response.detalles;
+                console.log(detalles);
                 var html = "";
                 if (detalles.length > 0) {
                     $.each(detalles, function(index, detalle) {
                         html += `<div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between w-full md:w-[48%] lg:w-[32%]">
-                                    <div>
-                                        <h1 class="text-md font-semibold text-gray-800">${detalle.pieza.codigo} | ${detalle.pieza.nombre} </h1>
+                                    <div class="flex flex-col w-full">
+                                        <h3 class="text-sm text-gray-500">${detalle.pieza.codigo}</h3>
+                                        <h1 class="text-md font-semibold text-gray-800">${detalle.pieza.nombre} </h1>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">-</button>
-                                        <span class="text-gray-700 font-medium mx-2">${detalle.unidades}</span>
-                                        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">+</button>
+                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnQuitar" data-id="${detalle.id_detalle}">-</button>
+                                        <input readonly class="txtCant${detalle.id_detalle} bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center" value="${detalle.unidades}">
+                                        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 btnAgregar" data-id="${detalle.id_detalle}">+</button>
                                     </div>
                                 </div>`;
                     });
@@ -311,4 +313,226 @@ $(function() {
         cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
     }
 
+    //quitar detalles de la nota de pieza
+
+    $(document).on('click', '.btnQuitar', function(e) {
+        e.preventDefault();
+        var id_detalle = $(this).attr('data-id');
+        var txtCant = $('.txtCant' + id_detalle).val();
+
+        if(txtCant <= 1) {
+            Swal.fire({
+                title: '¿Está seguro de quitar esta pieza?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Quitar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let baseDeleteUrl = $('meta[name="delete_pieza"]').attr('content');
+                    let finalUrl = baseDeleteUrl.replace('__ID__', id_detalle);
+                    $.ajax({
+                        url: finalUrl,
+                        type: 'DELETE',
+                        success: function(response) {
+                            if(response.success) {
+                                notyf.success(response.message);
+                                cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                            }else{
+                                notyf.error(response.message);
+                            }
+                        },error: function(xhr, status, error) {
+                            // Manejo de errores
+                            var responseText = xhr.responseText;
+                            if (xhr.status === 500) {
+                                if(xhr.responseJSON.message){
+                                    responseText = xhr.responseJSON.message;
+                                }else{
+                                    responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                                }
+                            }
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                html: responseText,
+                                showConfirmButton: true,
+                            });
+                        }
+                    });
+                }
+            });
+        }else{
+            let baseDeleteUrl = $('meta[name="update_pieza"]').attr('content');
+            let finalUrl = baseDeleteUrl.replace('__ID__', id_detalle);
+            finalUrl = finalUrl.replace('__CANT__', parseInt(txtCant) - 1);
+
+            $.ajax({
+                url: finalUrl,
+                type: 'PUT',
+                success: function(response) {
+                    if(response.success) {
+                        notyf.success(response.message);
+                        cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                    }else{
+                        notyf.error(response.message);
+                    }
+                },error: function(xhr, status, error) {
+                    // Manejo de errores
+                    var responseText = xhr.responseText;
+                    if (xhr.status === 500) {
+                        if(xhr.responseJSON.message){
+                            responseText = xhr.responseJSON.message;
+                        }else{
+                            responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                        }
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        html: responseText,
+                        showConfirmButton: true,
+                    });
+                }
+            });
+
+        }
+    });
+    
+
+    $(document).on('click', '.btnAgregar', function(e) {
+        e.preventDefault();
+        var id_detalle = $(this).attr('data-id');
+        var txtCant = $('.txtCant' + id_detalle).val();
+
+        let baseUpdateUrl = $('meta[name="update_pieza"]').attr('content');
+        let finalUrl = baseUpdateUrl.replace('__ID__', id_detalle);
+        finalUrl = finalUrl.replace('__CANT__', parseInt(txtCant) + 1);
+
+        $.ajax({
+            url: finalUrl,
+            type: 'PUT',
+            success: function(response) {
+                if(response.success) {
+                    notyf.success(response.message);
+                    cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                }else{
+                    notyf.error(response.message);
+                }
+            },error: function(xhr, status, error) {
+                // Manejo de errores
+                var responseText = xhr.responseText;
+                if (xhr.status === 500) {
+                    if(xhr.responseJSON.message){
+                        responseText = xhr.responseJSON.message;
+                    }else{
+                        responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                    }
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: responseText,
+                    showConfirmButton: true,
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '.btn_eliminar', function(e) {
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        Swal.fire({
+            title: '¿Está seguro de eliminar esta nota de pieza?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Eliminar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var baseDeleteUrl = $('meta[name="delete"]').attr('content');
+                let finalUrl = baseDeleteUrl.replace('__ID__', id);
+                $.ajax({
+                    url: finalUrl,
+                    type: 'DELETE',
+                    success: function(response) {
+                        if(response.success) {
+                            notyf.success(response.message);
+                            $('#tblPiezas').DataTable().ajax.reload();
+                        }else{
+                            notyf.error(response.message);
+                        }
+                    },error: function(xhr, status, error) {
+                        // Manejo de errores
+                        var responseText = xhr.responseText;
+                        if (xhr.status === 500) {
+                            if(xhr.responseJSON.message){
+                                responseText = xhr.responseJSON.message;
+                            }else{
+                                responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                            }
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            html: responseText,
+                            showConfirmButton: true,
+                        });
+                    }
+                });
+            }
+        });
+    }
+    );
+
+    $(document).on('click', '.btn_imprimir', function(e) {
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        Swal.fire({
+            title: '¿Está seguro de imprimir esta nota de pieza?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Imprimir'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var basePrintUrl = $('meta[name="print"]').attr('content');
+                let finalUrl = basePrintUrl.replace('__ID__', id);
+                window.open(finalUrl, '_blank');
+            }
+        });
+    });
+
+    $(document).on('click', '#btnImprimirPre', function(e) {
+
+        e.preventDefault();
+        var id = $('#frmCrear').attr('data-id');
+        var basePrintUrl = $('meta[name="print"]').attr('content');
+        let finalUrl = basePrintUrl.replace('__ID__', id);
+        window.open(finalUrl, '_blank');
+    });
+
+    $(document).on('click', '#btnImprimir', function(e) {
+
+        e.preventDefault();
+
+        Swal.fire({
+            title: '¿Está seguro de imprimir esta nota de pieza?',
+            text: 'Esta acción generará un documento PDF con los detalles de la nota que no se podra revertir.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Imprimir'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $('#frmCrear').attr('data-id');
+                var basePrintUrl = $('meta[name="print_real"]').attr('content');
+                let finalUrl = basePrintUrl.replace('__ID__', id);
+                window.open(finalUrl, '_blank');
+            }
+        }); 
+    });
 });

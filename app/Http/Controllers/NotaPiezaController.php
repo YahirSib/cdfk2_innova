@@ -8,6 +8,8 @@ use App\Models\Trabajadores;
 use Illuminate\Support\Facades\DB;
 use App\Models\Pieza;
 use App\Models\Detalle;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 class NotaPiezaController extends Controller
 {
@@ -115,8 +117,8 @@ class NotaPiezaController extends Controller
                 $html = '<div class="flex justify-evenly items-center">';
 
                 if($notaPieza->estado == 'A') {
-                    $html .= '<a id="btn_editar" data_id="'.$notaPieza->id_movimiento.'" href ="'. route('nota-pieza.edit', ['id' => $notaPieza->id_movimiento]) .'" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-yellow-600 hover:text-yellow-400 bx bxs-edit"></i></a>';
-                    $html .= '<button id="btn_eliminar" data_id="'.$notaPieza->id_movimiento.'" class="btn btn-sm btn-danger cursor-pointer"><i class=" text-2xl text-red-600 hover:text-red-400 bx bxs-trash"></i></button>';
+                    $html .= '<a data-id="'.$notaPieza->id_movimiento.'" href ="'. route('nota-pieza.edit', ['id' => $notaPieza->id_movimiento]) .'" class="btn_editar btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-yellow-600 hover:text-yellow-400 bx bxs-edit"></i></a>';
+                    $html .= '<button data-id="'.$notaPieza->id_movimiento.'" class="btn_eliminar btn btn-sm btn-danger cursor-pointer"><i class=" text-2xl text-red-600 hover:text-red-400 bx bxs-trash"></i></button>';
                 }else{
 
                 }
@@ -183,5 +185,144 @@ class NotaPiezaController extends Controller
         return response()->json(['success' => true, 'detalles' => $detalles, 'total' => $total, 'id_movimiento' => $id]);
     }
 
+    public function borrarDetalle($id)
+    {
+        $detalle = Detalle::find($id);
+        if (!$detalle) {
+            return response()->json(['success' => false, 'message' => 'Detalle no encontrado.']);
+        }
+
+        try {
+            DB::beginTransaction();
+            $movimiento = Movimiento::find($detalle->fk_movimiento);
+            $detalle->delete();
+            $total = $movimiento->totalizar();
+            Movimiento::where('id_movimiento', $movimiento->id_movimiento)->update(['total' => $total]);
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Detalle eliminado con éxito.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el detalle, contacte con Soporte Técnico.']);
+        }
+    }
+
+    public function actualizarDetalle($id, $cant)
+    {
+        $cant = (int) $cant; // Asegurarse de que la cantidad sea un entero
+        $detalle = Detalle::find($id);
+        if (!$detalle) {
+            return response()->json(['success' => false, 'message' => 'Detalle no encontrado.']);
+        }
+
+        $cantidad = $cant;
+        $precioUnitario = $detalle->costo_unitario;
+        $precioTotal = round($cantidad * $precioUnitario, 2);
+
+        try {
+            DB::beginTransaction();
+            $detalle->unidades = $cantidad;
+            $detalle->costo_total = $precioTotal;
+            $detalle->save();
+
+            $movimiento = Movimiento::find($detalle->fk_movimiento);
+            $total = $movimiento->totalizar();
+            Movimiento::where('id_movimiento', $movimiento->id_movimiento)->update(['total' => $total]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Detalle actualizado con éxito.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al actualizar el detalle, contacte con Soporte Técnico.']);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $notaPieza = Movimiento::find($id);
+        if (!$notaPieza) {
+            return response()->json(['success' => false, 'message' => 'Nota de Pieza no encontrada.']);
+        }
+
+        if ($notaPieza->estado !== 'A') {
+            return response()->json(['success' => false, 'message' => 'No se puede eliminar una Nota de Pieza que no está activa.']);
+        }
+
+        // Borrar los detalles asociados a la Nota de Pieza
+        $detalles = Detalle::where('fk_movimiento', $notaPieza->id_movimiento)->get();
+        foreach ($detalles as $detalle) {
+            $detalle->delete();
+        }
+
+        try {
+            DB::beginTransaction();
+            $notaPieza->delete();
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Nota de Pieza eliminada con éxito.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al eliminar Nota de Pieza, contacte con Soporte Técnico.']);
+        }
+    }
+
+    public function renderPDF($notaPieza, $detalles, $total, $totalUnidades, $data){
+        ini_set('memory_limit', '512M');
+        $pdf = Pdf::loadView('movimientos.nota-piezas.pdfNP', compact('notaPieza', 'detalles', 'total', 'totalUnidades', 'data'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->stream('nota_pieza' . $notaPieza->correlativo . '.pdf');
+    }
+
+    public function imprimirPreliminar($id)
+    {
+        
+        $data = [];
+        $data['title'] = 'NOTA DE PIEZA PRELIMINAR';
+        $notaPieza = Movimiento::find($id);
+        $data['notaPieza'] = $notaPieza;
+        $data['correlativo'] = $notaPieza->correlativo_formateado;
+        $data['fecha_ingreso'] = $notaPieza->fecha_ingreso_formateada;
+        $data['cacastero'] = $notaPieza->nombre_cacastero;
+        $detalles = $notaPieza->detalles()->with('pieza')->get();
+        $total = $notaPieza->totalizar();
+        $totalUnidades = $notaPieza->totalizarUnidades();
+        return $this->renderPDF($notaPieza, $detalles, $total, $totalUnidades, $data);
+    }
+
+    public function imprimirFinal($id)
+    {
+        try{
+            DB::beginTransaction();
+            $data = [];
+            $data['title'] = 'NOTA DE PIEZA';
+            $notaPieza = Movimiento::find($id);
+            $data['notaPieza'] = $notaPieza;
+            $data['correlativo'] = $notaPieza->correlativo_formateado;
+            $data['fecha_ingreso'] = $notaPieza->fecha_ingreso_formateada;
+            $data['cacastero'] = $notaPieza->nombre_cacastero;
+            $detalles = $notaPieza->detalles()->with('pieza')->get();
+            $total = $notaPieza->totalizar();
+            $totalUnidades = $notaPieza->totalizarUnidades();
+
+            $notaPieza->estado = 'I';
+            $notaPieza->fecha_impresion = now(); 
+            $notaPieza->save();
+
+            foreach ($detalles as $detalle) {
+                $id_pieza = $detalle->fk_pieza;
+                $pieza = Pieza::find($id_pieza);
+                $pieza->existencia = $pieza->totalizarExistencias();
+                $pieza->save();
+            }
+
+            DB::commit();
+            return $this->renderPDF($notaPieza, $detalles, $total, $totalUnidades, $data);
+        }catch(\Exception $e){
+            DB::rollBack();
+            \Log::error('Error al generar PDF de Nota de Pieza: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al generar el PDF, contacte con Soporte Técnico.']);
+        }
+
+        
+    }
 
 }

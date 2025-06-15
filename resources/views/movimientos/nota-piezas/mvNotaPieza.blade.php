@@ -5,6 +5,7 @@
 @section('content')
 
 <meta name="datatable" content="{{ route('nota-pieza.datatable') }}">
+<meta name="delete" content="{{ route('nota-pieza.delete', ['id' => '__ID__']) }}">
 <meta name="action" content = "ver">
 
 <div class="container w-full p-4">

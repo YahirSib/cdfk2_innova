@@ -43,7 +43,7 @@ Route::prefix('salas')->group(function () {
     Route::post('/getPiezas', [SalasController::class, 'getPiezas'])->name('salas.getPiezas');
     Route::post('/savePiezas', [SalasController::class, 'savePiezas'])->name('salas.savePiezas');
     Route::post('/getPiezasBySala', [SalasController::class, 'getPiezasBySala'])->name('salas.getPiezasBySala');
-    Route::delete('/deletePiezaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
+    Route::delete('/deletePiezid_detalleaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
     Route::put('/updatePiezaBySala', [SalasController::class, 'updatePiezaBySala'])->name('salas.updatePiezaBySala');
 });
 
@@ -56,7 +56,11 @@ Route::prefix('nota-pieza')->group(function () {
     Route::post('/update', [NotaPiezaController::class, 'update'])->name('nota-pieza.update');
     Route::post('/savePiezas', [NotaPiezaController::class, 'guardarDetalle'])->name('nota-pieza.savePiezas');
     Route::get('/getPiezas/{id}', [NotaPiezaController::class, 'cargarDetalles'])->name('nota-pieza.getPiezas');
-    // Route::delete('/{id}', [App\Http\Controllers\NotaPiezaController::class, 'destroy'])->name('nota-pieza.delete');
+    Route::delete('/deletePieza/{id}', [NotaPiezaController::class, 'borrarDetalle'])->name('nota-pieza.deletePieza');
+    Route::put('/updatePieza/{id}/{cant}', [NotaPiezaController::class, 'actualizarDetalle'])->name('nota-pieza.updatePieza');
+    Route::delete('/{id}', [App\Http\Controllers\NotaPiezaController::class, 'destroy'])->name('nota-pieza.delete');
+    Route::get('/print/{id}', [NotaPiezaController::class, 'imprimirPreliminar'])->name('nota-pieza.print_preliminar');
+    Route::get('/print-final/{id}', [NotaPiezaController::class, 'imprimirFinal'])->name('nota-pieza.print_final');
 });
 
 
