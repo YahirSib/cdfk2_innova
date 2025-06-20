@@ -536,9 +536,9 @@ $(function() {
                         `);
                     });
                 }else{
-                    ('#piezas_table_body').append(`
+                    $('#piezas_table_body').append(`
                             <tr>
-                                <td col-span="3" class="px-2 py-2"> No existen piezas relacionadas.</td>
+                                <td colspan="2" class="px-2 py-2 text-center"> No existen piezas relacionadas.</td>
                             </tr>
                     `);
                 }
