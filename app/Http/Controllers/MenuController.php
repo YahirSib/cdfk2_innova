@@ -20,7 +20,7 @@ class MenuController extends Controller
         
 
         // Obtener todos los menús permitidos
-        $menus = MenuLateral::whereIn('id_menu', $permisos)->get();
+        $menus = MenuLateral::whereIn('id_menu', $permisos)->orderBy('ordenamiento')->get();
 
        
 

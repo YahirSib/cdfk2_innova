@@ -22,8 +22,13 @@ Route::get('/logout', function () {
 
 Route::get('/',[RenderAppController::class, 'index'])->middleware('auth')->name('index');
 
-Route::prefix('perfil')->group(function () {
+Route::middleware(['auth'])->prefix('perfil')->group(function () {
     Route::get('/', [PerfilController::class, 'index'])->name('perfil.index');
+    Route::get('/edit/{id}', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::post('/', [PerfilController::class, 'store'])->name('perfil.store');
+    Route::get('/datatable', [PerfilController::class, 'datatable'])->name('perfil.datatable');
+    Route::delete('/{id}', [PerfilController::class, 'destroy'])->name('perfil.delete');
+    Route::put('/', [PerfilController::class, 'update'])->name('perfil.update');
 });
 
 Route::middleware(['auth'])->prefix('trabajadores')->group(function () {
