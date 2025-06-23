@@ -1,21 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\TrabajadoresController;
 use App\Http\Controllers\PiezasController;
 use App\Http\Controllers\SalasController;
 use App\Http\Controllers\NotaPiezaController;
+use App\Http\Controllers\Auth\LoginController;
+
+
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+
+
+Route::get('/logout', function () {
+    Auth::logout();
+    return redirect()->route('login');
+})->name('logout')->middleware('auth');
+
 
 Route::get('/', function () {
     return view('index');
-})->name('index');
+})->middleware('auth')->name('index');
 
 Route::prefix('perfil')->group(function () {
     Route::get('/', [PerfilController::class, 'index'])->name('perfil.index');
 });
 
-Route::prefix('trabajadores')->group(function () {
+Route::middleware(['auth'])->prefix('trabajadores')->group(function () {
     Route::get('/', [TrabajadoresController::class, 'index'])->name('trabajadores.index');
     Route::get('/edit/{id}', [TrabajadoresController::class, 'edit'])->name('trabajadores.edit');
     Route::post('/', [TrabajadoresController::class, 'store'])->name('trabajadores.store');
@@ -24,7 +37,7 @@ Route::prefix('trabajadores')->group(function () {
     Route::put('/', [TrabajadoresController::class, 'update'])->name('trabajadores.update');
 });
 
-Route::prefix('piezas')->group(function () {
+Route::middleware(['auth'])->prefix('piezas')->group(function () {
     Route::get('/', [PiezasController::class, 'index'])->name('piezas.index');
     Route::get('/edit/{id}', [PiezasController::class, 'edit'])->name('piezas.edit');
     Route::post('/', [PiezasController::class, 'store'])->name('piezas.store');
@@ -33,7 +46,7 @@ Route::prefix('piezas')->group(function () {
     Route::put('/', [PiezasController::class, 'update'])->name('piezas.update');
 });
 
-Route::prefix('salas')->group(function () {
+Route::middleware(['auth'])->prefix('salas')->group(function () {
     Route::get('/', [SalasController::class, 'index'])->name('salas.index');
     Route::get('/edit/{id}', [SalasController::class, 'edit'])->name('salas.edit');
     Route::post('/', [SalasController::class, 'store'])->name('salas.store');
@@ -47,7 +60,7 @@ Route::prefix('salas')->group(function () {
     Route::put('/updatePiezaBySala', [SalasController::class, 'updatePiezaBySala'])->name('salas.updatePiezaBySala');
 });
 
-Route::prefix('nota-pieza')->group(function () {
+Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
     Route::get('/', [NotaPiezaController::class, 'index'])->name('nota-pieza.index');
     Route::get('/create', [NotaPiezaController::class, 'create'])->name('nota-pieza.create');
     Route::post('/', [NotaPiezaController::class, 'store'])->name('nota-pieza.store');

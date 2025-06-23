@@ -9,12 +9,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 </head>
-<body>
+<body class="bg-neutral-100">
     <div class="container">
         <!-- Menú de navegación -->
         <x-navbar />
         <!-- Contenido dinámico -->
-        <main class="p-4 sm:ml-64 mt-14 w-full min-h-[90vh] sm:w-[calc(100vw-16rem)] bg-neutral-100">
+        <main class="p-4 sm:ml-64 mt-14 w-full min-h-[90vh] sm:w-[calc(99vw-17rem)] bg-neutral-100">
             @yield('content')
         </main>
     </div>

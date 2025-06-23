@@ -394,7 +394,7 @@ $(function() {
 
                 </form>
 
-                <div class="text-left mt-4 mb-2 bg-white p-6 rounded-lg shadow-md mb-8">
+                <div class="text-left mt-4 mb-2 bg-white p-6 rounded-lg shadow-md ">
                     <div id="conformacion_piezas" class="overflow-y-auto max-h-60">
                         <table class="table-auto w-lg sm:w-full p-3">
                             <thead>
