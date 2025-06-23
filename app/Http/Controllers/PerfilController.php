@@ -8,7 +8,8 @@ class PerfilController extends Controller
 {
     public function index()
     {
-        return view('mantenimientos.mtPerfil');
+        $menu = (new MenuController)->obtenerMenu();
+        return view('mantenimientos.mtPerfil', ['menu' => $menu]);
     }
 
     public function create()

@@ -15,7 +15,8 @@ class NotaPiezaController extends Controller
 {
     public function index()
     {
-        return view('movimientos.nota-piezas.mvNotaPieza');
+        $menu = (new MenuController)->obtenerMenu();
+        return view('movimientos.nota-piezas.mvNotaPieza', ['menu' => $menu]);
     }
     
     public function create()
@@ -321,7 +322,6 @@ class NotaPiezaController extends Controller
             return $this->renderPDF($notaPieza, $detalles, $total, $totalUnidades, $data);
         }catch(\Exception $e){
             DB::rollBack();
-            \Log::error('Error al generar PDF de Nota de Pieza: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Error al generar el PDF, contacte con Soporte Técnico.']);
         }
 
@@ -380,7 +380,6 @@ class NotaPiezaController extends Controller
             return $this->renderPDF($notaPieza, $detalles, $total, $totalUnidades, $data);
         }catch(\Exception $e){
             DB::rollBack();
-            \Log::error('Error al generar PDF de Nota de Pieza: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Error al generar el PDF, contacte con Soporte Técnico.']);
         }
     }

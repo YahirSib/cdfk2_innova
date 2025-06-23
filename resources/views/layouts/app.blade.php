@@ -12,7 +12,7 @@
 <body class="bg-neutral-100">
     <div class="container">
         <!-- Menú de navegación -->
-        <x-navbar />
+        <x-navbar :menu="$menu"/>
         <!-- Contenido dinámico -->
         <main class="p-4 sm:ml-64 mt-14 w-full min-h-[90vh] sm:w-[calc(99vw-17rem)] bg-neutral-100">
             @yield('content')

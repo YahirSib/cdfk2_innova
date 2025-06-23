@@ -13,7 +13,8 @@ class TrabajadoresController extends Controller
 {
     public function index()
     {
-        return view('mantenimientos.mtTrabajadores');
+        $menu = (new MenuController)->obtenerMenu();
+        return view('mantenimientos.mtTrabajadores', ['menu' => $menu]);
     }
 
     public function store(Request $request)

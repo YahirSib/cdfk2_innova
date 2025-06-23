@@ -1,3 +1,4 @@
+
 <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
       <div class="flex items-center justify-between">
@@ -47,66 +48,22 @@
   <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
      <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
-            <!-- MENU DE MANTENIMIENTOS -->
-            <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-mantos" data-collapse-toggle="dropdown-mantos">
-                <i class='text-xl bx bxs-layer'></i>
-                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Mantenimientos</span>
+            @foreach ($menu as $grupo => $datos)
+              <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-mantos" data-collapse-toggle="dropdown-{{$grupo}}">
+                <i class='text-xl {{ $datos["icono"] }}'></i>
+                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">{{ $grupo }}</span>
                 <i class='text-lg bx bx-chevron-down'></i>
-            </button>
-            <ul id="dropdown-mantos" class="hidden py-2 space-y-2">
-                  <li>
-                     <a href="{{ route('trabajadores.index') }}"class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Trabajadores</a>
+              </button>
+
+              <ul id="dropdown-{{$grupo}}" class="hidden py-2 space-y-2">
+                  @foreach ($datos['hijos'] as $hijo)
+                      <li>
+                     <a href="{{ route($hijo['ruta']) }}"class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">{{$hijo['nombre']}}</a>
                   </li>
-                  <li>
-                    <a href="{{ route('piezas.index') }}" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Piezas</a>
-                 </li>
-                 <li>
-                    <a href="{{ route('salas.index') }}" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Salas</a>
-                </li>
-            </ul>
-          <!-- MENU DE MOVIMIENTOS -->
-          <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-movi" data-collapse-toggle="dropdown-movi">
-              <i class='text-xl bx bxs-box'></i>
-              <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Movimientos</span>
-              <i class='text-lg bx bx-chevron-down'></i>
-          </button>
-          <ul id="dropdown-movi" class="hidden py-2 space-y-2">
-                <li>
-                  <a href="{{ route('nota-pieza.index') }}" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Nota de Pieza</a>
-                </li>
-                <li>
-                  <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Armaduria de Sala</a>
-                </li>
-                <li>
-                  <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Traslado a Tapiceria</a>
-                </li>
-                <li>
-                    <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Nota de Entrega</a>
-                </li>
-                <li>
-                    <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Nota de Bodega</a>
-                </li>
-          </ul>
-          <!-- MENU DE REPORTES -->
-          <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-reporte" data-collapse-toggle="dropdown-reporte">
-            <i class='text-xl bx bxs-file'></i>
-            <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Reportes</span>
-            <i class='text-lg bx bx-chevron-down'></i>
-        </button>
-        <ul id="dropdown-reporte" class="hidden py-2 space-y-2">
-              <li>
-                <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Reporte de Bodega</a>
-              </li>
-              <li>
-                <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Reporte de Salas</a>
-              </li>
-              <li>
-                <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Reporte Produccion</a>
-              </li>
-              <li>
-                  <a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Nota de Reporte de Notas de Entrega</a>
-              </li>
-        </ul>
+                  @endforeach
+              </ul>
+
+            @endforeach
         </ul>
      </div>
   </aside>

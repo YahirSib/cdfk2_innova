@@ -13,7 +13,8 @@ class SalasController extends Controller
 {
     public function index()
     {
-        return view('mantenimientos.mtSalas');
+        $menu = (new MenuController)->obtenerMenu();
+        return view('mantenimientos.mtSalas', ['menu' => $menu]);
     }
 
     public function store(Request $request)

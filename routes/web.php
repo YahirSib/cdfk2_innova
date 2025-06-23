@@ -8,7 +8,7 @@ use App\Http\Controllers\PiezasController;
 use App\Http\Controllers\SalasController;
 use App\Http\Controllers\NotaPiezaController;
 use App\Http\Controllers\Auth\LoginController;
-
+use App\Http\Controllers\RenderAppController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
@@ -20,9 +20,7 @@ Route::get('/logout', function () {
 })->name('logout')->middleware('auth');
 
 
-Route::get('/', function () {
-    return view('index');
-})->middleware('auth')->name('index');
+Route::get('/',[RenderAppController::class, 'index'])->middleware('auth')->name('index');
 
 Route::prefix('perfil')->group(function () {
     Route::get('/', [PerfilController::class, 'index'])->name('perfil.index');
