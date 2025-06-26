@@ -1,14 +1,14 @@
-import notyf from '../../js/app.js';
+import notyf from '../app.js';
 import Swal from "sweetalert2";
 
 $(function() {
 
     function limpiarFormulario() {
-        $('#frmPerfil')[0].reset();
-        $('#tblPerfil').DataTable().ajax.reload();
+        $('#frmUsuarios')[0].reset();
+        $('#tblUsuarios').DataTable().ajax.reload();
     }
 
-    $('#tblPerfil').DataTable({
+    $('#tblUsuarios').DataTable({
         processing: true,
         serverSide: true,
         searching: true,
@@ -28,12 +28,9 @@ $(function() {
         },
         columns: [
             { data: 'id' },
-            { data: 'nombre' },
-            { data: 'estado', render: function(data, type, row) {
-                if (data === "1") return 'Activo';
-                if (data === "2") return 'Inactivo';
-                return data;
-            }},
+            { data: 'name' },
+            { data: 'email'},
+            { data: 'perfil_nombre'},
             { data: 'acciones', orderable: false, searchable: false }
         ],
         dom: 
@@ -54,16 +51,17 @@ $(function() {
         }
     });
 
-    $('#frmPerfil').on('submit', function(e) {
+    $('#frmUsuarios').on('submit', function(e) {
         e.preventDefault();
         var method = $(this).attr('method');
         var action = $(this).attr('action');
         var formData = new FormData(this);
         formData.append('_method', method);
+        formData.append('password_confirmation', $('#password').val());
         //CUANDO EL METODO ES PUT SE ACTUALIZA EL TRABAJADOR
         if(method == 'PUT'){
             Swal.fire({
-                title: '¿Está seguro de actualizar el perfil?',
+                title: '¿Está seguro de actualizar el usuario?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -72,7 +70,7 @@ $(function() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     //SI CONFIRMA SE ENVIA EL FORMULARIO
-                    formData.append('id', $('#frmPerfil').attr('data_id'));
+                    formData.append('id', $('#frmUsuarios').attr('data_id'));
                     $.ajax({
                         url: action,
                         type: 'POST',
@@ -83,7 +81,7 @@ $(function() {
                             if(response.success) {
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'Perfil actualizado',
+                                    title: 'Usuario actualizado',
                                     text: response.message,
                                     showConfirmButton: true,
                                     timer: 1500
@@ -143,7 +141,7 @@ $(function() {
                 if(response.success) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Perfil guardado',
+                            title: 'Usuario guardado',
                             text: response.message,
                             showConfirmButton: true,
                             timer: 1500
@@ -202,12 +200,14 @@ $(function() {
                 console.log(response);
                 if (response.success) {
 
-                    $('#nombre').val(response.data.nombre);
-                    $('#estado').val(response.data.estado);
+                    $('#name').val(response.data.name);
+                    $('#perfil_id').val(response.data.perfil_id);
+                    $('#email').val(response.data.email);
+                    $('#password').addClass('hidden');
                     //Cambio form para editar
-                    $('#frmPerfil').attr('action', $('meta[name="update"]').attr('content'));
-                    $('#frmPerfil').attr('data_id', id);
-                    $('#frmPerfil').attr('method', 'PUT');
+                    $('#frmUsuarios').attr('action', $('meta[name="update"]').attr('content'));
+                    $('#frmUsuarios').attr('data_id', id);
+                    $('#frmUsuarios').attr('method', 'PUT');
                     $('#btnForm').html('Actualizar');
                     $('#btnCrear').removeClass('hidden');
 
@@ -243,12 +243,13 @@ $(function() {
 
     $("#btnCrear").on('click', function(e) {
         e.preventDefault();
-        $('#frmPerfil').attr('action', $('meta[name="store"]').attr('content'));
-        $('#frmPerfil').attr('method', 'POST');
-        $('#frmPerfil').removeAttr('data_id');
+        $('#frmUsuarios').attr('action', $('meta[name="store"]').attr('content'));
+        $('#frmUsuarios').attr('method', 'POST');
+        $('#frmUsuarios').removeAttr('data_id');
         $('#btnForm').html('Guardar');
         $('#btnCrear').addClass('hidden');
-        $('#nombre').focus();
+        $('#password').removeClass('hidden');
+        $('#name').focus();
         limpiarFormulario();
     }); 
 

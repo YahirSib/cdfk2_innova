@@ -9,6 +9,7 @@ use App\Http\Controllers\SalasController;
 use App\Http\Controllers\NotaPiezaController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RenderAppController;
+use App\Http\Controllers\UserController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
@@ -29,6 +30,15 @@ Route::middleware(['auth'])->prefix('perfil')->group(function () {
     Route::get('/datatable', [PerfilController::class, 'datatable'])->name('perfil.datatable');
     Route::delete('/{id}', [PerfilController::class, 'destroy'])->name('perfil.delete');
     Route::put('/', [PerfilController::class, 'update'])->name('perfil.update');
+});
+
+Route::middleware(['auth'])->prefix('usuarios')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('usuarios.index');
+    // Route::get('/edit/{id}', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::post('/', [UserController::class, 'store'])->name('usuarios.store');
+    Route::get('/datatable', [UserController::class, 'datatable'])->name('usuarios.datatable');
+    // Route::delete('/{id}', [PerfilController::class, 'destroy'])->name('perfil.delete');
+    // Route::put('/', [PerfilController::class, 'update'])->name('perfil.update');
 });
 
 Route::middleware(['auth'])->prefix('trabajadores')->group(function () {
