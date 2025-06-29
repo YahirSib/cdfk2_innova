@@ -2,11 +2,12 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import inject from '@rollup/plugin-inject';
 import tailwindcss from '@tailwindcss/vite';
+import { sync as globSync } from 'glob';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: ['resources/css/app.css', ...globSync('resources/js/**/*.js') ],
             refresh: true,
         }),
         inject({
