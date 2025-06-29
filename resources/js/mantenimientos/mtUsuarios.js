@@ -203,7 +203,7 @@ $(function() {
                     $('#name').val(response.data.name);
                     $('#perfil_id').val(response.data.perfil_id);
                     $('#email').val(response.data.email);
-                    $('#password').addClass('hidden');
+                    $('#pass-div').addClass('hidden');
                     //Cambio form para editar
                     $('#frmUsuarios').attr('action', $('meta[name="update"]').attr('content'));
                     $('#frmUsuarios').attr('data_id', id);
@@ -248,7 +248,7 @@ $(function() {
         $('#frmUsuarios').removeAttr('data_id');
         $('#btnForm').html('Guardar');
         $('#btnCrear').addClass('hidden');
-        $('#password').removeClass('hidden');
+        $('#pass-div').removeClass('hidden');
         $('#name').focus();
         limpiarFormulario();
     }); 
@@ -275,6 +275,118 @@ $(function() {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Perfil eliminado',
+                                text: response.message,
+                                showConfirmButton: true,
+                                timer: 1500
+                            }).then(() => {
+                                limpiarFormulario();
+                            });
+                        }else{
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message,
+                                showConfirmButton: true,
+                            });
+                        }
+                    },error: function(xhr, status, error) {
+                        // Manejo de errores
+                        var responseText = xhr.responseText;
+                        if (xhr.status === 500) {
+                            console.log(xhr);
+                            if(xhr.responseJSON.message){
+                                responseText = xhr.responseJSON.message;
+                            }else{
+                                responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                            }
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            html: responseText,
+                            showConfirmButton: true,
+                        });
+                    }
+                });
+            }
+        }
+        );
+    });
+
+    $(document).on('click', '#btn_reset', function(e){
+        e.preventDefault();
+        var id = $(this).attr('data_id');
+        let baseResetUrl = $('meta[name="reset"]').attr('content');
+        let csrfToken = $('meta[name="csrf-token"]').attr('content');
+        Swal.fire({
+        title: "Cambiar contraseña",
+        input: "text",
+        inputAttributes: {
+            autocapitalize: "off"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Cambiar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (nuevaPassword) => {
+            try {
+                const response = await fetch(baseResetUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        password: nuevaPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || "Error al cambiar la contraseña.");
+                }
+
+                return data;
+            } catch (error) {
+            Swal.showValidationMessage(`
+                ${error}
+            `);
+            }
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                title: `Contraseña cambiada con exito`
+                });
+            }
+        });
+    });
+
+
+    $(document).on('click', '#btn_eliminar', function(e) {
+        e.preventDefault();
+        var id = $(this).attr('data_id');
+        let baseDeleteUrl = $('meta[name="delete"]').attr('content');
+        let finalUrl = baseDeleteUrl.replace('__ID__', id);
+        Swal.fire({
+            title: '¿Está seguro de eliminar el usuario?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Eliminar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: finalUrl,
+                    type: 'DELETE',
+                    success: function(response) {
+                        if(response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Usuario eliminado',
                                 text: response.message,
                                 showConfirmButton: true,
                                 timer: 1500

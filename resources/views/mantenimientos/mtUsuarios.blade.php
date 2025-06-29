@@ -5,10 +5,11 @@
 @section('content')
 <!-- Meta tags para las rutas -->
 <meta name="datatable" content="{{ route('usuarios.datatable') }}">
-<meta name="edit" content="{{ route('perfil.edit', ['id' => '__ID__']) }}">
-<meta name="delete" content="{{ route('perfil.delete', ['id' => '__ID__']) }}">
+<meta name="edit" content="{{ route('usuarios.edit', ['id' => '__ID__']) }}">
+<meta name="delete" content="{{ route('usuarios.delete', ['id' => '__ID__']) }}">
 <meta name="store" content="{{ route('usuarios.store') }}">
-<meta name="update" content="{{ route('perfil.update')}}">
+<meta name="update" content="{{ route('usuarios.update')}}">
+<meta name="reset" content="{{ route('usuarios.reset')}}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4">
@@ -25,7 +26,7 @@
                     <input type="text" id="name" name="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Nombre del usuario">
                 </div>
 
-                <div class="col-span-2">
+                <div class="col-span-2" id="pass-div">
                     <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Contraseña<span class="text-red-500">(*)</span></label>
                     <input type="password" id="password" name="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contraseña del usuario">
                 </div>
@@ -35,7 +36,7 @@
                     <input type="email" id="email" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Correo electronico para iniciar sesion">
                 </div>
                 
-                <div class="col-span-2">
+                <div class="col-span-2" >
                     <label for="perfil_id" class="block mb-2 text-sm font-medium text-gray-900">Perfil <span class="text-red-500">(*)</span></label>
                     <select id="perfil_id" name="perfil_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         <option value="0"> Seleccione una opción </option>

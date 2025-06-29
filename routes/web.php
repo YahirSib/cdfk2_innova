@@ -34,11 +34,12 @@ Route::middleware(['auth'])->prefix('perfil')->group(function () {
 
 Route::middleware(['auth'])->prefix('usuarios')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('usuarios.index');
-    // Route::get('/edit/{id}', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::get('/edit/{id}', [UserController::class, 'edit'])->name('usuarios.edit');
     Route::post('/', [UserController::class, 'store'])->name('usuarios.store');
     Route::get('/datatable', [UserController::class, 'datatable'])->name('usuarios.datatable');
-    // Route::delete('/{id}', [PerfilController::class, 'destroy'])->name('perfil.delete');
-    // Route::put('/', [PerfilController::class, 'update'])->name('perfil.update');
+    Route::delete('/{id}', [UserController::class, 'destroy'])->name('usuarios.delete');
+    Route::put('/', [UserController::class, 'update'])->name('usuarios.update');
+    Route::post('/reset', [UserController::class, 'reset_pass'])->name('usuarios.reset');
 });
 
 Route::middleware(['auth'])->prefix('trabajadores')->group(function () {

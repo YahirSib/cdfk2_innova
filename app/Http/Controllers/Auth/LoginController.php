@@ -33,7 +33,7 @@ class LoginController extends Controller
 
         Auth::login($user); // login manual
 
-         return response()->json(['success' => true, 'redirect' => route('index')]);
+        return response()->json(['success' => true, 'redirect' => route('index')]);
 
     }
 }
