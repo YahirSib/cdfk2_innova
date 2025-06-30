@@ -41,7 +41,8 @@ class NotaPiezaController extends Controller
         $notaPieza->correlativo = 'NP-' . str_pad($notaPieza->correlativo, 5, '0', STR_PAD_LEFT);
         $data['carpintero'] = Trabajadores::all()->where('tipo', 2);
         $data['notaPieza'] = $notaPieza;
-        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data]);
+        $menu = (new MenuController)->obtenerMenu();
+        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $menu]);
     }
 
     public function update(Request $request)
