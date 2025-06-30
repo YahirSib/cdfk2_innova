@@ -30,7 +30,8 @@ class NotaPiezaController extends Controller
         }
         $data['correlativo'] = 'NP-' . str_pad($numero, 5, '0', STR_PAD_LEFT);
         $data['action'] = 'crear';
-        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data]);
+        $menu = (new MenuController)->obtenerMenu();
+        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $menu]);
     }
 
     public function edit($id)
