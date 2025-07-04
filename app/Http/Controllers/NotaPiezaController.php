@@ -42,6 +42,11 @@ class NotaPiezaController extends Controller
         $data['carpintero'] = Trabajadores::all()->where('tipo', 2);
         $data['notaPieza'] = $notaPieza;
         $menu = (new MenuController)->obtenerMenu();
+
+        if($notaPieza->estado != 'A') {
+            return redirect()->route('nota-pieza.index')->with('error', 'No se puede editar una Nota de Pieza que no está activa.');
+        }
+        
         return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $menu]);
     }
 

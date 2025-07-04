@@ -14,6 +14,7 @@
 <meta name="update_pieza" content="{{ route('nota-pieza.updatePieza', ['id' => '__ID__', 'cant' => '__CANT__']) }}">
 <meta name="print" content="{{ route('nota-pieza.print_preliminar', ['id' => '__ID__']) }}">
 <meta name="print_real" content="{{ route('nota-pieza.print_final', ['id' => '__ID__']) }}">
+<meta name="redirect" content="{{ route('nota-pieza.index') }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4 flex justify-between">
@@ -113,12 +114,12 @@
                     <span id="totalPiezas" class="text-2xl font-bold text-gray-800">0</span>
                 </div>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-2 w-full sm:w-auto">
-                    <a id="btnImprimirPre" class="inline-flex w-full sm:w-auto justify-center items-center gap-2 bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition">
+                    <a id="btnImprimirPre" class="cursor-pointer inline-flex w-full sm:w-auto justify-center items-center gap-2 bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition">
                         <i class='bx bxs-printer text-xl'></i>
                         Preliminar
                     </a>
 
-                    <a id="btnImprimir" class="inline-flex w-full sm:w-auto justify-center items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                    <a id="btnImprimir" class="cursor-pointer inline-flex w-full sm:w-auto justify-center items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
                         <i class='bx bxs-printer text-xl'></i>
                         Imprimir
                     </a>

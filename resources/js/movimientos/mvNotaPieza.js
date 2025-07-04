@@ -512,16 +512,21 @@ $(function() {
         var id = $('#frmCrear').attr('data-id');
         var basePrintUrl = $('meta[name="print"]').attr('content');
         let finalUrl = basePrintUrl.replace('__ID__', id);
-        window.open(finalUrl, '_blank');
+        // Abrir como ventana emergente
+        let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+            return;
+        }
     });
 
     $(document).on('click', '#btnImprimir', function(e) {
-
         e.preventDefault();
 
         Swal.fire({
             title: '¿Está seguro de imprimir esta nota de pieza?',
-            text: 'Esta acción generará un documento PDF con los detalles de la nota que no se podra revertir.',
+            text: 'Esta acción generará un documento PDF con los detalles de la nota que no se podrá revertir.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -531,11 +536,25 @@ $(function() {
             if (result.isConfirmed) {
                 var id = $('#frmCrear').attr('data-id');
                 var basePrintUrl = $('meta[name="print_real"]').attr('content');
+                var redirectUrl = $('meta[name="redirect"]').attr('content'); // Asegúrate que este meta exista
                 let finalUrl = basePrintUrl.replace('__ID__', id);
-                window.open(finalUrl, '_blank');
+
+                // Abrir como ventana emergente
+                let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+                if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                    Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+                    return;
+                }
+
+                // Redirige luego de un pequeño retraso
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1000); // Puedes ajustar el tiempo si lo deseas
             }
-        }); 
+        });
     });
+
 
     $(document).on( 'click' ,'.btnReporte', function(e){
         e.preventDefault();
@@ -545,7 +564,13 @@ $(function() {
 
         var basePrintUrl = $('meta[name="print_historico"]').attr('content');
         let finalUrl = basePrintUrl.replace('__ID__', id);
-        window.open(finalUrl, '_blank');
+        // Abrir como ventana emergente
+        let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+            return;
+        }
 
         
     });
@@ -565,7 +590,13 @@ $(function() {
             if (result.isConfirmed) {
                 var basePrintUrl = $('meta[name="print_anulada"]').attr('content');
                 let finalUrl = basePrintUrl.replace('__ID__', id);
-                window.open(finalUrl, '_blank');
+                // Abrir como ventana emergente
+                let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+                if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                    Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+                    return;
+                }
             }
         }); 
     });
