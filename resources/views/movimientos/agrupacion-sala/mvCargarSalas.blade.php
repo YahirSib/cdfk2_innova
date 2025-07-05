@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Nota de Pieza')
+@section('title', 'Agrupación de Sala')
 
 @section('content')
 
@@ -12,17 +12,17 @@
 
 <div class="container w-full p-4">
     <div class="w-full mb-4">
-        <h1 class="text-2xl font-bold text-gray-800">Nota de Pieza</h1>
-        <p class="text-gray-600">Almacenamiento de piezas</p>
+        <h1 class="text-2xl font-bold text-gray-800">Agrupación de Sala</h1>
+        <p class="text-gray-600">Generación de almacenamiento de salas</p>
     </div>
 
     <!-- DataTable -->
     <div class="bg-white p-6 rounded-lg shadow-md">
         <div class="mb-4 w-full flex items-center justify-between">
-            <h2 class="text-xl font-semibold text-gray-800">Listado de Piezas</h2>
+            <h2 class="text-xl font-semibold text-gray-800">Listado de Salas</h2>
 
-            <a id="btnNuevo" href="{{ route('nota-pieza.create') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-1">
-                    Agregar Pieza
+            <a id="btnNuevo" href="{{ route('agrupacion-sala.create') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-1">
+                    Agregar Sala
             </a>
 
         </div>
@@ -46,5 +46,5 @@
 @endsection
 
 @section('script')
-    @vite(['resources/js/movimientos/mvNotaPieza.js'])
+    @vite(['resources/js/movimientos/mvAgrupacionSala.js'])
 @endsection

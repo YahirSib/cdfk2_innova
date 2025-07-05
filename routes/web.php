@@ -10,6 +10,7 @@ use App\Http\Controllers\NotaPiezaController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RenderAppController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AgrupacionSalaController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
@@ -92,6 +93,24 @@ Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
     Route::get('/print-anulada/{id}', [NotaPiezaController::class, 'imprimirAnular'])->name('nota-pieza.print_anulada');
 });
 
+
+Route::middleware(['auth'])->prefix('agrupacion-sala')->group(function () {
+    Route::get('/', [AgrupacionSalaController::class, 'index'])->name('agrupacion-sala.index');
+    Route::get('/create', [AgrupacionSalaController::class, 'create'])->name('agrupacion-sala.create');
+    // Route::post('/', [AgrupacionSalaController::class, 'store'])->name('agrupacion-sala.store');
+    // Route::get('/datatable', [AgrupacionSalaController::class, 'datatable'])->name('agrupacion-sala.datatable');
+    // Route::get('/edit/{id}', [AgrupacionSalaController::class, 'edit'])->name('agrupacion-sala.edit');
+    // Route::post('/update', [AgrupacionSalaController::class, 'update'])->name('agrupacion-sala.update');
+    // Route::post('/savePiezas', [AgrupacionSalaController::class, 'guardarDetalle'])->name('agrupacion-sala.savePiezas');
+    // Route::get('/getPiezas/{id}', [AgrupacionSalaController::class, 'cargarDetalles'])->name('agrupacion-sala.getPiezas');
+    // Route::delete('/deletePieza/{id}', [AgrupacionSalaController::class, 'borrarDetalle'])->name('agrupacion-sala.deletePieza');
+    // Route::put('/updatePieza/{id}/{cant}', [AgrupacionSalaController::class, 'actualizarDetalle'])->name('agrupacion-sala.updatePieza');
+    // Route::delete('/{id}', [App\Http\Controllers\AgrupacionSalaController::class, 'destroy'])->name('agrupacion-sala.delete');
+    // Route::get('/print/{id}', [AgrupacionSalaController::class, 'imprimirPreliminar'])->name('agrupacion-sala.print_preliminar');
+    // Route::get('/print-final/{id}', [AgrupacionSalaController::class, 'imprimirFinal'])->name('agrupacion-sala.print_final');
+    // Route::get('/print-historico/{id}', [AgrupacionSalaController::class, 'imprimirHistorico'])->name('agrupacion-sala.print_historico');
+    // Route::get('/print-anulada/{id}', [AgrupacionSalaController::class, 'imprimirAnular'])->name('agrupacion-sala.print_anulada');
+});
 
 
 
