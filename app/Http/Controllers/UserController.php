@@ -13,11 +13,8 @@ class UserController extends Controller
 {
 
     public function index(){
-        $menu = (new MenuController)->obtenerMenu();
-
         $perfiles = Perfil::all()->where('estado', 1);
-
-        return view('mantenimientos.mtUsuarios', ['menu' => $menu, 'perfiles' => $perfiles]);
+        return view('mantenimientos.mtUsuarios', ['menu' => $this->getMenu(), 'perfiles' => $perfiles]);
     }
 
     public function store(Request $request)

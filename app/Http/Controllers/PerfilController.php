@@ -11,8 +11,7 @@ class PerfilController extends Controller
 {
     public function index()
     {
-        $menu = (new MenuController)->obtenerMenu();
-        return view('mantenimientos.mtPerfil', ['menu' => $menu]);
+        return view('mantenimientos.mtPerfil', ['menu' => $this->getMenu()]);
     }
 
     public function edit($id)

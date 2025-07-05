@@ -177,8 +177,7 @@ $(function() {
 
     //datatable de notas de piezas
 
-    //cargar tabla de salas
-    $('#tblPiezas').DataTable({
+    let tabla = $('#tblPiezas').DataTable({
         processing: true,
         serverSide: true,
         searching: true,
@@ -187,9 +186,13 @@ $(function() {
         order: [[0, 'desc']],
         responsive: true,
         autoWidth: false,
+        lengthChange: false,
         ajax: {
             url: $('meta[name="datatable"]').attr('content'),
             type: 'GET',
+            data: function(d) {
+                d.mes = $('#filtroMes').val(); // Enviamos el valor del filtro
+            }
         },
         language: {
             searchPlaceholder: "Buscar...",
@@ -209,9 +212,10 @@ $(function() {
             { data: 'acciones', orderable: false, searchable: false }
         ],
         dom: 
-            '<"flex justify-end mb-4"f>' + // Buscador alineado a la derecha
-            '<"overflow-x-auto border border-gray-200 rounded-lg"t>' + // Tabla con borde y scroll
-            '<"flex justify-end mt-4"p>', // Paginación alineada a la derecha
+            '<"flex justify-end items-center mb-4 "lf>' + // l = length, f = filter, alineados en la misma fila
+            '<"overflow-x-auto border border-gray-200 rounded-lg"t>' +
+            '<"flex justify-end mt-4"p>',
+
 
         drawCallback: function() {
             // Estilos para el input de búsqueda
@@ -225,6 +229,21 @@ $(function() {
             }).remove();
         }
     });
+
+    $('#filtroMes').on('change', function() {
+        tabla.ajax.reload();
+    });
+
+
+
+    $.get($('meta[name="meses-url"]').attr('content'), function(data) {
+        data.forEach(function(mes) {
+            $('#filtroMes').append(
+                `<option value="${mes.mes}">${mes.nombre_mes}</option>`
+            );
+        });
+    });
+
 
 
     $('#pieza_sala').autocomplete({
@@ -512,16 +531,21 @@ $(function() {
         var id = $('#frmCrear').attr('data-id');
         var basePrintUrl = $('meta[name="print"]').attr('content');
         let finalUrl = basePrintUrl.replace('__ID__', id);
-        window.open(finalUrl, '_blank');
+        // Abrir como ventana emergente
+        let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+            return;
+        }
     });
 
     $(document).on('click', '#btnImprimir', function(e) {
-
         e.preventDefault();
 
         Swal.fire({
             title: '¿Está seguro de imprimir esta nota de pieza?',
-            text: 'Esta acción generará un documento PDF con los detalles de la nota que no se podra revertir.',
+            text: 'Esta acción generará un documento PDF con los detalles de la nota que no se podrá revertir.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -531,11 +555,25 @@ $(function() {
             if (result.isConfirmed) {
                 var id = $('#frmCrear').attr('data-id');
                 var basePrintUrl = $('meta[name="print_real"]').attr('content');
+                var redirectUrl = $('meta[name="redirect"]').attr('content'); // Asegúrate que este meta exista
                 let finalUrl = basePrintUrl.replace('__ID__', id);
-                window.open(finalUrl, '_blank');
+
+                // Abrir como ventana emergente
+                let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+                if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                    Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+                    return;
+                }
+
+                // Redirige luego de un pequeño retraso
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1000); // Puedes ajustar el tiempo si lo deseas
             }
-        }); 
+        });
     });
+
 
     $(document).on( 'click' ,'.btnReporte', function(e){
         e.preventDefault();
@@ -545,7 +583,13 @@ $(function() {
 
         var basePrintUrl = $('meta[name="print_historico"]').attr('content');
         let finalUrl = basePrintUrl.replace('__ID__', id);
-        window.open(finalUrl, '_blank');
+        // Abrir como ventana emergente
+        let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+            return;
+        }
 
         
     });
@@ -565,7 +609,13 @@ $(function() {
             if (result.isConfirmed) {
                 var basePrintUrl = $('meta[name="print_anulada"]').attr('content');
                 let finalUrl = basePrintUrl.replace('__ID__', id);
-                window.open(finalUrl, '_blank');
+                // Abrir como ventana emergente
+                let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+                if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                    Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+                    return;
+                }
             }
         }); 
     });

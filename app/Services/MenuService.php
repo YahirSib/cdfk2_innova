@@ -1,46 +1,48 @@
 <?php
-namespace App\Http\Controllers;
+
+namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
-use App\Models\Perfil;
 use App\Models\PermisoMenu;
 use App\Models\MenuLateral;
 
-class MenuController extends Controller
+class MenuService
 {
-    public function obtenerMenu()
+
+    /**
+     * Obtiene el menú lateral basado en los permisos del usuario autenticado.
+     *
+     * @return array
+     */
+
+    public static function obtenerMenu()
     {
+
+        if(!Auth::check()) {
+            return []; // Retorna un array vacío si el usuario no está autenticado
+        }   
+
         $perfilId = Auth::user()->perfil_id;
 
-        // Obtener los IDs de menú con permiso
         $permisos = PermisoMenu::where('id_perfil', $perfilId)
             ->where('estado', 1)
             ->pluck('id_menu');
 
-        
+        $menus = MenuLateral::whereIn('id_menu', $permisos)
+            ->orderBy('ordenamiento')
+            ->get();
 
-        // Obtener todos los menús permitidos
-        $menus = MenuLateral::whereIn('id_menu', $permisos)->orderBy('ordenamiento')->get();
-
-       
-
-        // Separar menús padres (submenús) y sus hijos
         $menu = [];
-        $cont = 0;
 
         foreach ($menus as $item) {
-            
             if (is_null($item->padre)) {
-                // Es un submenú (grupo)
                 $menu[$item->nombre] = [
                     'icono' => $item->icono,
                     'hijos' => []
                 ];
-                $cont++;
             }
         }
 
-        // Agregar hijos a su respectivo grupo
         foreach ($menus as $item) {
             if (!is_null($item->padre)) {
                 $padre = $menus->firstWhere('id_menu', $item->padre);

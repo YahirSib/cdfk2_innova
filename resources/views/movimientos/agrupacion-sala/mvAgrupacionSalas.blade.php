@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Creacion de Nota de Pieza')
+@section('title', 'Creacion de Agrupacion de Salas')
 
 @section('content')
 
@@ -15,16 +15,15 @@
 <meta name="print" content="{{ route('nota-pieza.print_preliminar', ['id' => '__ID__']) }}">
 <meta name="print_real" content="{{ route('nota-pieza.print_final', ['id' => '__ID__']) }}">
 <meta name="redirect" content="{{ route('nota-pieza.index') }}">
-<meta name="meses-url" content="{{ route('nota-pieza.meses') }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4 flex justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Nota de Pieza</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Agrupación de Sala</h1>
             <p id="p-indicador" class="text-gray-600"> {{ $data['action'] == 'crear' ? 'Creación de documento' : 'Edición de documento' }} </p>
         </div>
         <div>
-            <a id="btnNuevo" href="{{ route('nota-pieza.index') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-1">
+            <a id="btnNuevo" href="{{ route('agrupacion-sala.index') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-1">
                     Regresar
             </a>
         </div>

@@ -8,7 +8,6 @@ use App\Http\Controllers\MenuController;
 class RenderAppController extends Controller
 {
     public function index(){
-        $menu = (new MenuController)->obtenerMenu();
-        return view('index', ['menu' => $menu]);
+        return view('index', ['menu' => $this->getMenu()]);
     }
 }
