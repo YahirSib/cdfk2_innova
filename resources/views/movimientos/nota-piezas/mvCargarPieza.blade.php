@@ -15,6 +15,7 @@
 <meta name="print" content="{{ route('nota-pieza.print_preliminar', ['id' => '__ID__']) }}">
 <meta name="print_real" content="{{ route('nota-pieza.print_final', ['id' => '__ID__']) }}">
 <meta name="redirect" content="{{ route('nota-pieza.index') }}">
+<meta name="meses-url" content="{{ route('nota-pieza.meses') }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4 flex justify-between">

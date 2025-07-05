@@ -91,6 +91,7 @@ Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
     Route::get('/print-final/{id}', [NotaPiezaController::class, 'imprimirFinal'])->name('nota-pieza.print_final');
     Route::get('/print-historico/{id}', [NotaPiezaController::class, 'imprimirHistorico'])->name('nota-pieza.print_historico');
     Route::get('/print-anulada/{id}', [NotaPiezaController::class, 'imprimirAnular'])->name('nota-pieza.print_anulada');
+    Route::get('nota-pieza/meses', [NotaPiezaController::class, 'obtenerMeses'])->name('nota-pieza.meses');
 });
 
 

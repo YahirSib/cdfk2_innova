@@ -136,7 +136,19 @@ class NotaPiezaController extends Controller
             ->where('tipo_doc', $this->getTipoDoc())
             ->orderBy('id_movimiento', 'desc');
 
+        if ($request->filled('mes')) {
+            $notaPiezas->whereMonth('fecha_ingreso', $request->mes);
+        }
+
         return datatables()->of($notaPiezas)
+            ->filterColumn('nombre_cacastero', function($query, $keyword) {
+                $sql = 'LOWER(CONCAT(trabajadores.nombre1, " ", trabajadores.nombre2, " ", trabajadores.apellido1, " ", trabajadores.apellido2)) LIKE ?';
+                $query->whereRaw($sql, ["%" . strtolower($keyword) . "%"]);
+            })
+            ->filterColumn('correlativo', function($query, $keyword) {
+                $sql = 'LOWER(CONCAT("'.$this->getTipoDoc().'-", LPAD(correlativo, 5, "0"))) LIKE ?';
+                $query->whereRaw($sql, ["%" . strtolower($keyword) . "%"]);
+            })
             ->addColumn('acciones', function($notaPieza) {
 
                 $html = '<div class="flex justify-evenly items-center">';
@@ -159,6 +171,21 @@ class NotaPiezaController extends Controller
 
 
     }
+
+   public function obtenerMeses()
+    {
+        // Forzar idioma español
+        DB::statement("SET lc_time_names = 'es_ES'");
+
+        $meses = Movimiento::query()
+            ->selectRaw("DISTINCT MONTH(fecha_ingreso) as mes, UPPER(MONTHNAME(fecha_ingreso)) as nombre_mes")
+            ->where('tipo_doc', $this->getTipoDoc())
+            ->orderByRaw('mes')
+            ->get();
+
+        return response()->json($meses);
+    }
+
 
     public function guardarDetalle(Request $request){
         $request->validate([
