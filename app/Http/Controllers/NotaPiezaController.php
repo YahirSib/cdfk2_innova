@@ -13,41 +13,58 @@ use Illuminate\Support\Facades\Log;
 
 class NotaPiezaController extends Controller
 {
+
+    private $tipo_doc = 'NP'; // Agrupación de Salas
+    private $tipo_mov = 'E'; // Tipo de movimiento para Nota de Pieza
+    private $nombre_doc = 'Nota de Pieza'; // Nombre del documento
+
+    public function getTipoDoc()
+    {
+        return $this->tipo_doc;
+    }   
+
+    public function getTipoMov()
+    {
+        return $this->tipo_mov;
+    }
+
+    public function getNombreDoc()
+    {
+        return $this->nombre_doc;
+    }
+
     public function index()
     {
-        $menu = (new MenuController)->obtenerMenu();
-        return view('movimientos.nota-piezas.mvNotaPieza', ['menu' => $menu]);
+        return view('movimientos.nota-piezas.mvNotaPieza', ['menu' => $this->getMenu()]);
     }
     
     public function create()
     {
         $data['carpintero'] = Trabajadores::all()->where('tipo', 2);
-        $maximo = Movimiento::where('tipo_doc', 'NP')->max('correlativo');
+        $maximo = Movimiento::where('tipo_doc', $this->getTipoDoc())->max('correlativo');
         if($maximo === null) {
             $numero = 1;
         }else{
             $numero = $maximo + 1;
         }
-        $data['correlativo'] = 'NP-' . str_pad($numero, 5, '0', STR_PAD_LEFT);
+        $data['correlativo'] = $this->getTipoDoc(). '-' . str_pad($numero, 5, '0', STR_PAD_LEFT);
         $data['action'] = 'crear';
-        $menu = (new MenuController)->obtenerMenu();
-        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $menu]);
+        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $this->getMenu()]);
     }
 
     public function edit($id)
     {
         $notaPieza = Movimiento::findOrFail($id);
         $data['action'] = 'editar';
-        $notaPieza->correlativo = 'NP-' . str_pad($notaPieza->correlativo, 5, '0', STR_PAD_LEFT);
+        $notaPieza->correlativo = $this->getTipoDoc(). '-' . str_pad($notaPieza->correlativo, 5, '0', STR_PAD_LEFT);
         $data['carpintero'] = Trabajadores::all()->where('tipo', 2);
         $data['notaPieza'] = $notaPieza;
-        $menu = (new MenuController)->obtenerMenu();
 
         if($notaPieza->estado != 'A') {
             return redirect()->route('nota-pieza.index')->with('error', 'No se puede editar una Nota de Pieza que no está activa.');
         }
-        
-        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $menu]);
+
+        return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $this->getMenu()]);
     }
 
     public function update(Request $request)
@@ -82,8 +99,8 @@ class NotaPiezaController extends Controller
 
         $notaPieza = new Movimiento();
 
-        $notaPieza->tipo_mov = 'E'; // Asignar tipo de movimiento
-        $notaPieza->tipo_doc = 'NP'; // Asignar tipo de documento
+        $notaPieza->tipo_mov = $this->getTipoMov(); // Asignar tipo de movimiento
+        $notaPieza->tipo_doc = $this->getTipoDoc(); // Asignar tipo de documento
         $notaPieza->fecha_ingreso = now(); // Fecha actual
         $notaPieza->cacastero = $request->cacastero; // Asignar el ID del carpintero
         $notaPieza->total = 0; // Inicializar total en 0
@@ -109,14 +126,14 @@ class NotaPiezaController extends Controller
     {
         $notaPiezas = Movimiento::query()
             ->select('id_movimiento', 
-                DB::raw('CONCAT("NP-", LPAD(correlativo, 5, "0")) AS correlativo'),
+                DB::raw('CONCAT("'.$this->getTipoDoc().'-", LPAD(correlativo, 5, "0")) AS correlativo'),
                 DB::raw('DATE_FORMAT(fecha_ingreso, "%d/%m/%Y") AS fecha_ingreso'), 
                 'cacastero', 
                 'comentario', 
                 'estado', 
                 DB::raw('CONCAT(trabajadores.nombre1, " ", trabajadores.nombre2, " ", trabajadores.apellido1, " ", trabajadores.apellido2) AS nombre_cacastero'))
             ->join('trabajadores', 'inv_movimiento.cacastero', '=', 'trabajadores.id_trabajador')
-            ->where('tipo_doc', 'NP')
+            ->where('tipo_doc', $this->getTipoDoc())
             ->orderBy('id_movimiento', 'desc');
 
         return datatables()->of($notaPiezas)
@@ -287,7 +304,7 @@ class NotaPiezaController extends Controller
     {
         
         $data = [];
-        $data['title'] = 'NOTA DE PIEZA PRELIMINAR';
+        $data['title'] = strtoupper( $this->nombre_doc . ' PRELIMINAR');
         $notaPieza = Movimiento::find($id);
         $data['notaPieza'] = $notaPieza;
         $data['correlativo'] = $notaPieza->correlativo_formateado;
@@ -304,7 +321,7 @@ class NotaPiezaController extends Controller
         try{
             DB::beginTransaction();
             $data = [];
-            $data['title'] = 'NOTA DE PIEZA';
+            $data['title'] = strtoupper($this->nombre_doc);
             $notaPieza = Movimiento::find($id);
             $data['notaPieza'] = $notaPieza;
             $data['correlativo'] = $notaPieza->correlativo_formateado;
@@ -342,9 +359,9 @@ class NotaPiezaController extends Controller
         $notaPieza = Movimiento::find($id);
 
         if($notaPieza->estado == "I"){
-            $data['title'] = 'NOTA DE PIEZA HISTORICA';
+            $data['title'] = strtoupper($this->nombre_doc . ' HISTORICA');
         }else{
-            $data['title'] = 'NOTA DE PIEZA ANULADA';
+            $data['title'] = strtoupper($this->nombre_doc . ' ANULADA');
         }
 
         $data['notaPieza'] = $notaPieza;
@@ -362,7 +379,7 @@ class NotaPiezaController extends Controller
         try{
             DB::beginTransaction();
             $data = [];
-            $data['title'] = 'NOTA DE PIEZA ANULADA';
+            $data['title'] = strtoupper($this->nombre_doc . ' ANULADA');
             $notaPieza = Movimiento::find($id);
             $data['notaPieza'] = $notaPieza;
             $data['correlativo'] = $notaPieza->correlativo_formateado;

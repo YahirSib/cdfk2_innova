@@ -13,8 +13,7 @@ class PiezasController extends Controller
 {
     public function index()
     {
-        $menu = (new MenuController)->obtenerMenu();
-        return view('mantenimientos.mtPiezas', ['menu' => $menu]);
+        return view('mantenimientos.mtPiezas', ['menu' => $this->getMenu()]);
     }
 
     public function store(Request $request)
