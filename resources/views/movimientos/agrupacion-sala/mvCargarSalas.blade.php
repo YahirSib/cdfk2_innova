@@ -4,11 +4,13 @@
 
 @section('content')
 
-<meta name="datatable" content="{{ route('nota-pieza.datatable') }}">
-<meta name="delete" content="{{ route('nota-pieza.delete', ['id' => '__ID__']) }}">
+<meta name="datatable" content="{{ route('agrupacion-sala.datatable') }}">
+<meta name="delete" content="{{ route('agrupacion-sala.delete', ['id' => '__ID__']) }}">
+{{-- 
 <meta name="action" content = "ver">
-<meta name="print_historico" content="{{ route('nota-pieza.print_historico', ['id' => '__ID__']) }}">
-<meta name="print_anulada" content="{{ route('nota-pieza.print_anulada', ['id' => '__ID__']) }}">
+<meta name="print_historico" content="{{ route('agrupacion-sala.print_historico', ['id' => '__ID__']) }}">
+<meta name="print_anulada" content="{{ route('agrupacion-sala.print_anulada', ['id' => '__ID__']) }}"> --}}
+<meta name="meses-url" content="{{ route('agrupacion-sala.meses') }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4">
@@ -27,7 +29,17 @@
 
         </div>
         <div class="relative overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm text-gray-700" id="tblPiezas">
+
+            <div class="flex justify-end sm:justify-start sm:absolute relative items-center mb-4 z-10">
+                <div id="filtroMesContainer">
+                    <select id="filtroMes" class="border border-gray-300 rounded pr-10 text-sm">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <!-- El buscador de DataTables aparecerá automáticamente a la derecha -->
+            </div>
+
+            <table class="min-w-full divide-y divide-gray-200 text-sm text-gray-700" id="tblSalas">
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="px-4 py-2 text-left">N° Doc</th>

@@ -8,6 +8,7 @@ use App\Models\Trabajadores;
 use Illuminate\Support\Facades\DB;
 use App\Models\Pieza;
 use App\Models\Detalle;
+use App\Services\MenuService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 
@@ -61,7 +62,7 @@ class NotaPiezaController extends Controller
         $data['notaPieza'] = $notaPieza;
 
         if($notaPieza->estado != 'A') {
-            return redirect()->route('nota-pieza.index')->with('error', 'No se puede editar una Nota de Pieza que no está activa.');
+            return redirect()->route('nota-pieza.index')->with('error', 'No se puede editar una '.$this->getNombreDoc().' que no está activa.');
         }
 
         return view('movimientos.nota-piezas.mvCargarPieza', ['data' => $data, 'menu' => $this->getMenu()]);
@@ -83,10 +84,10 @@ class NotaPiezaController extends Controller
             DB::beginTransaction();
             $notaPieza->update();
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Nota de Pieza actualizada con exito.']);
+            return response()->json(['success' => true, 'message' =>  $this->getNombreDoc().' actualizada con exito.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Error al actualizar Nota de Pieza, contacte con Soporte Técnico.']);
+            return response()->json(['success' => false, 'message' => 'Error al actualizar '.$this->getNombreDoc().', contacte con Soporte Técnico.']);
         }
     }
 
@@ -113,10 +114,10 @@ class NotaPiezaController extends Controller
             DB::beginTransaction();
             $notaPieza->save();
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Nota de Pieza registrada con exito.', 'redirect' => route('nota-pieza.edit', ['id' => $notaPieza->id_movimiento])]);
+            return response()->json(['success' => true, 'message' =>  $this->getNombreDoc().' registrada con exito.', 'redirect' => route('nota-pieza.edit', ['id' => $notaPieza->id_movimiento])]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Error al registrar Nota de Pieza, contacte con Soporte Técnico.']);
+            return response()->json(['success' => false, 'message' => 'Error al registrar '.$this->getNombreDoc().', contacte con Soporte Técnico.']);
         }  
         
         
@@ -172,20 +173,10 @@ class NotaPiezaController extends Controller
 
     }
 
-   public function obtenerMeses()
+    public function obtenerMeses()
     {
-        // Forzar idioma español
-        DB::statement("SET lc_time_names = 'es_ES'");
-
-        $meses = Movimiento::query()
-            ->selectRaw("DISTINCT MONTH(fecha_ingreso) as mes, UPPER(MONTHNAME(fecha_ingreso)) as nombre_mes")
-            ->where('tipo_doc', $this->getTipoDoc())
-            ->orderByRaw('mes')
-            ->get();
-
-        return response()->json($meses);
+        return $this->obtenerMesesTipoDoc($this->getTipoDoc());
     }
-
 
     public function guardarDetalle(Request $request){
         $request->validate([
@@ -295,11 +286,11 @@ class NotaPiezaController extends Controller
     {
         $notaPieza = Movimiento::find($id);
         if (!$notaPieza) {
-            return response()->json(['success' => false, 'message' => 'Nota de Pieza no encontrada.']);
+            return response()->json(['success' => false, 'message' =>  $this->getNombreDoc().' no encontrada.']);
         }
 
         if ($notaPieza->estado !== 'A') {
-            return response()->json(['success' => false, 'message' => 'No se puede eliminar una Nota de Pieza que no está activa.']);
+            return response()->json(['success' => false, 'message' => 'No se puede eliminar una '.$this->getNombreDoc().' que no está activa.']);
         }
 
         // Borrar los detalles asociados a la Nota de Pieza
@@ -312,10 +303,10 @@ class NotaPiezaController extends Controller
             DB::beginTransaction();
             $notaPieza->delete();
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Nota de Pieza eliminada con éxito.']);
+            return response()->json(['success' => true, 'message' =>  $this->getNombreDoc().' eliminada con éxito.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Error al eliminar Nota de Pieza, contacte con Soporte Técnico.']);
+            return response()->json(['success' => false, 'message' => 'Error al eliminar '.$this->getNombreDoc().', contacte con Soporte Técnico.']);
         }
     }
 

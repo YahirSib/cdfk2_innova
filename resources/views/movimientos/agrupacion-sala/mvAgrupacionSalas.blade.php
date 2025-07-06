@@ -4,17 +4,18 @@
 
 @section('content')
 
-<meta name="store" content="{{ route('nota-pieza.store') }}">
-<meta name="update" content="{{ route('nota-pieza.update') }}">
+<meta name="store" content="{{ route('agrupacion-sala.store') }}">
+{{-- <meta name="update" content="{{ route('agrupacion-sala.update') }}"> --}}
 <meta name="piezas" content="{{ route('salas.getPiezas') }}">
-<meta name="store_pieza" content="{{ route('nota-pieza.savePiezas') }}">
-<meta name="cargar_pieza" content="{{ route('nota-pieza.getPiezas', ['id' => '__ID__']) }}">
+{{-- <meta name="store_pieza" content="{{ route('agrupacion-sala.savePiezas') }}">
+<meta name="cargar_pieza" content="{{ route('agrupacion-sala.getPiezas', ['id' => '__ID__']) }}">
 <meta name="action" content="{{ $data['action'] }}">
-<meta name="delete_pieza" content="{{ route('nota-pieza.deletePieza', ['id' => '__ID__']) }}">
-<meta name="update_pieza" content="{{ route('nota-pieza.updatePieza', ['id' => '__ID__', 'cant' => '__CANT__']) }}">
-<meta name="print" content="{{ route('nota-pieza.print_preliminar', ['id' => '__ID__']) }}">
-<meta name="print_real" content="{{ route('nota-pieza.print_final', ['id' => '__ID__']) }}">
-<meta name="redirect" content="{{ route('nota-pieza.index') }}">
+<meta name="delete_pieza" content="{{ route('agrupacion-sala.deletePieza', ['id' => '__ID__']) }}">
+<meta name="update_pieza" content="{{ route('agrupacion-sala.updatePieza', ['id' => '__ID__', 'cant' => '__CANT__']) }}">
+<meta name="print" content="{{ route('agrupacion-sala.print_preliminar', ['id' => '__ID__']) }}">
+<meta name="print_real" content="{{ route('agrupacion-sala.print_final', ['id' => '__ID__']) }}"> --}}
+<meta name="redirect" content="{{ route('agrupacion-sala.index') }}">
+<meta name="meses-url" content="{{ route('agrupacion-sala.meses') }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4 flex justify-between">
@@ -43,25 +44,25 @@
             </li>
         </ul>
     </div>
-    <div id="default-tab-content" >
+    <div id="default-tab-content">
         <div class="hidden p-4 bg-white rounded-lg shadow-md" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-            <form id="frmCrear" data-id="{{ $data['action'] == 'crear' ? '' : $data['notaPieza']->id_movimiento }}"  method="{{ $data['action'] == 'crear' ? 'POST' : 'PUT' }}">
+            <form id="frmCrear" data-id="{{ $data['action'] == 'crear' ? '' : $data['AC_entrada']->id_movimiento }}"  method="{{ $data['action'] == 'crear' ? 'POST' : 'PUT' }}">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <!-- Nombre del empleado-->
                     <div>
                         <label for="fecha" class="block mb-2 text-sm font-medium text-gray-900">Fecha Documento</label>
-                        <input type="date" id="fecha" name="fecha" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" value="{{ $data['action'] == 'crear' ? date('Y-m-d') : date('Y-m-d', strtotime($data['notaPieza']->fecha_ingreso)) }}" readonly>
+                        <input type="date" id="fecha" name="fecha" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" value="{{ $data['action'] == 'crear' ? date('Y-m-d') : date('Y-m-d', strtotime($data['AC_entrada']->fecha_ingreso)) }}" readonly>
                     </div>
                     <div>
                         <label for="correlativo" class="block mb-2 text-sm font-medium text-gray-900">N° Documento </label>
-                        <input type="text" id="correlativo" name="correlativo" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" value="{{ $data['action'] == 'crear' ? $data['correlativo'] : $data['notaPieza']->correlativo}}" readonly>
+                        <input type="text" id="correlativo" name="correlativo" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" value="{{ $data['action'] == 'crear' ? $data['correlativo'] : $data['AC_entrada']->correlativo}}" readonly>
                     </div>
                     <div class="col-span-1 sm:col-span-2  lg:col-span-2">
                         <label for="cacastero" class="block mb-2 text-sm font-medium text-gray-900">Cacastero <span class="text-red-500">(*)</span></label>
                         <select id="cacastero" name="cacastero" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             <option value="">Seleccione un cacastero</option>
                             @foreach ($data['carpintero'] as $cacastero)
-                                @if($data['action'] == 'editar' && $cacastero->id_trabajador == $data['notaPieza']->cacastero)
+                                @if($data['action'] == 'editar' && $cacastero->id_trabajador == $data['AC_entrada']->cacastero)
                                     <option value="{{ $cacastero->id_trabajador }}" selected>{{ $cacastero->nombre1 }} {{ $cacastero->nombre2 }} {{ $cacastero->apellido1 }} {{$cacastero->apellido2}}</option>
                                 @else
                                     <option value="{{ $cacastero->id_trabajador }}">{{ $cacastero->nombre1 }} {{ $cacastero->nombre2 }} {{ $cacastero->apellido1 }} {{$cacastero->apellido2}}</option>
@@ -71,7 +72,7 @@
                     </div>
                     <div class=" col-span-1 sm:col-span-2  lg:col-span-4">
                         <label for="comentario" class="block mb-2 text-sm font-medium text-gray-900">Comentario </label>
-                        <textarea type="text" id="comentario" name="comentario" class="bg-gray-50 h-auto border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el comentario">{{ $data['action'] == 'crear' ? '' : $data['notaPieza']->comentario }}</textarea>
+                        <textarea type="text" id="comentario" name="comentario" class="bg-gray-50 h-auto border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el comentario">{{ $data['action'] == 'crear' ? '' : $data['AC_entrada']->comentario }}</textarea>
                     </div>
                 </div>
                 
@@ -84,25 +85,90 @@
             </form>
         </div>
         <div class="hidden " id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
-            <form class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-10 gap-2 bg-white p-4 rounded-lg shadow-md mb-8" id="frmAnexarPieza" method="POST" action="">
+            <form class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-10 gap-2 bg-white p-4 rounded-lg shadow-md mb-8" id="frmAnexarSala" method="POST" action="">
                 <div class="md:col-span-3 lg:col-span-5 mb-2" >
-                    <label for="pieza_sala" class="block mb-2  md:text-left  text-sm font-medium text-gray-900">Pieza<span class="text-red-500">(*)</span> </label>
+                    <label for="pieza_sala" class="block mb-2  md:text-left  text-sm font-medium text-gray-900">Sala <span class="text-red-500">(*)</span> </label>
                     <input type="text" id="pieza_sala" name="pieza_sala" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Buscar pieza">
-                </div>
-
-                <div class="md:col-span-3 lg:col-span-5 mb-2">
-                    <label for="cantidad" class="block mb-2 text-sm md:text-left font-medium text-gray-900">Cantidad<span class="text-red-500">(*)</span> </label>
-                    <input type="text" id="cantidad" name="cantidad" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese la cantidad de piezas">
                 </div>
 
                 <div class="md:col-span-6 lg:col-span-10 mb-2">
                     <label for="comentario" class="block mb-2 text-sm font-medium text-gray-900"> </label>
-                    <button {{ $data['action'] == 'crear' ? 'disabled' : '' }} id="btnGuardarPieza" type="submit" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-2xl w-full px-5 py-2.5 text-center m-1">
+                    <button {{ $data['action'] == 'crear' ? 'disabled' : '' }} id="btnGuardarSala" type="submit" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-2xl w-full px-5 py-2.5 text-center m-1">
                         +
                     </button>
                 </div>
 
             </form>
+
+            <!-- ACORDEON PARA LAS SALAS Y SUS PIEZAS -->
+            <div class="bg-white p-4 rounded-lg shadow-md mb-8">
+
+                <div id="accordion" data-accordion="collapse" class="w-full max-w-2xl mx-auto">
+                    <!-- Item 1 -->
+                    <h2>
+                        <button type="button"
+                        class="flex justify-between items-center w-full py-4 px-5 text-left font-medium text-gray-800 bg-white border border-gray-200 hover:bg-gray-50 transition-all"
+                        data-accordion-target="#accordion-body-1"
+                        aria-expanded="false"
+                        aria-controls="accordion-body-1">
+                        <span class="font-bold"> Sala Nayeli</span>
+                        <svg data-accordion-icon class="w-4 h-4 shrink-0 transition-transform duration-300 rotate-180"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5 5 1 1 5" />
+                        </svg>
+                        </button>
+                    </h2>
+                    <div id="accordion-body-1" class="hidden transition-all overflow-hidden duration-300" aria-labelledby="accordion-heading-1">
+                        <div class="p-4 text-gray-700 border border-t-0 border-gray-200 flex flex-col items-center">
+                            <div class="w-full grid grid-cols-3 gap-4 items-center">
+                                <!-- Código y nombre -->
+                                <div class="flex flex-col items-start gap-1">
+                                    <span class="text-gray-800 font-semibold text-sm">PZ001</span>
+                                    <span class="text-gray-500 text-sm">Pieza 1</span>
+                                </div>
+
+                                <!-- Disponibilidad -->
+                                <div class="flex flex-col items-start gap-1">
+                                    <span class="text-sm text-gray-500">Disponible</span>
+                                    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                                        10
+                                    </span>
+                                </div>
+
+                                <!-- Input -->
+                                <div>
+                                    <input type="number" id="cantidad_pieza_1" name="cantidad_pieza_1"
+                                        class="w-full text-sm rounded-lg border border-gray-300 bg-white text-gray-800 focus:ring-blue-500 focus:border-blue-500 p-2 transition"
+                                        value="0" min="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <h2>
+                        <button type="button"
+                        class="flex justify-between items-center w-full py-4 px-5 text-left font-medium text-gray-800 bg-white border-t-0 border border-gray-200 hover:bg-gray-50 transition-all"
+                        data-accordion-target="#accordion-body-2"
+                        aria-expanded="false"
+                        aria-controls="accordion-body-2">
+                        <span>¿Qué incluye?</span>
+                        <svg data-accordion-icon class="w-4 h-4 shrink-0 transition-transform duration-300 rotate-180"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5 5 1 1 5" />
+                        </svg>
+                        </button>
+                    </h2>
+                    <div id="accordion-body-2" class="hidden transition-all overflow-hidden duration-300" aria-labelledby="accordion-heading-2">
+                        <div class="px-5 py-4 text-gray-600 border border-t-0 border-gray-200">
+                        Incluye botones, modales, formularios y más.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div class="hidden" id="settings" role="tabpanel" aria-labelledby="settings-tab">
             <div class="flex flex-col md:flex-row gap-4 flex-wrap mb-4" id="divPiezas">
@@ -134,5 +200,5 @@
 @endsection
     
 @section('script')
-    @vite(['resources/js/movimientos/mvNotaPieza.js'])
+    @vite(['resources/js/movimientos/mvAgrupacionSala.js'])
 @endsection
