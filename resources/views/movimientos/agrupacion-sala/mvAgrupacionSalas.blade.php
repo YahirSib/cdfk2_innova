@@ -6,10 +6,12 @@
 
 <meta name="store" content="{{ route('agrupacion-sala.store') }}">
 {{-- <meta name="update" content="{{ route('agrupacion-sala.update') }}"> --}}
-<meta name="piezas" content="{{ route('salas.getPiezas') }}">
-{{-- <meta name="store_pieza" content="{{ route('agrupacion-sala.savePiezas') }}">
-<meta name="cargar_pieza" content="{{ route('agrupacion-sala.getPiezas', ['id' => '__ID__']) }}">
+<meta name="piezas" content="{{ route('piezas.getPiezas') }}">
+<meta name="salas" content="{{ route('salas.getSalas') }}">
+<meta name="store_sala" content="{{ route('agrupacion-sala.saveSalas') }}">
+<meta name="cargar_sala" content="{{ route('agrupacion-sala.getDetalle', ['id' => '__ID__']) }}">
 <meta name="action" content="{{ $data['action'] }}">
+{{-- 
 <meta name="delete_pieza" content="{{ route('agrupacion-sala.deletePieza', ['id' => '__ID__']) }}">
 <meta name="update_pieza" content="{{ route('agrupacion-sala.updatePieza', ['id' => '__ID__', 'cant' => '__CANT__']) }}">
 <meta name="print" content="{{ route('agrupacion-sala.print_preliminar', ['id' => '__ID__']) }}">
@@ -87,8 +89,13 @@
         <div class="hidden " id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
             <form class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-10 gap-2 bg-white p-4 rounded-lg shadow-md mb-8" id="frmAnexarSala" method="POST" action="">
                 <div class="md:col-span-3 lg:col-span-5 mb-2" >
-                    <label for="pieza_sala" class="block mb-2  md:text-left  text-sm font-medium text-gray-900">Sala <span class="text-red-500">(*)</span> </label>
-                    <input type="text" id="pieza_sala" name="pieza_sala" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Buscar pieza">
+                    <label for="sala-anexar" class="block mb-2  md:text-left  text-sm font-medium text-gray-900">Sala <span class="text-red-500">(*)</span> </label>
+                    <input type="text" id="sala-anexar" name="sala-anexar" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Buscar sala">
+                </div>
+
+                <div class="md:col-span-3 lg:col-span-5 mb-2" >
+                    <label for="cant-sala" class="block mb-2  md:text-left  text-sm font-medium text-gray-900">Cantidad <span class="text-red-500">(*)</span> </label>
+                    <input type="text" id="cant-sala" name="cant-sala" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingresar cantidad" value="1">
                 </div>
 
                 <div class="md:col-span-6 lg:col-span-10 mb-2">
@@ -100,74 +107,10 @@
 
             </form>
 
-            <!-- ACORDEON PARA LAS SALAS Y SUS PIEZAS -->
-            <div class="bg-white p-4 rounded-lg shadow-md mb-8">
-
-                <div id="accordion" data-accordion="collapse" class="w-full max-w-2xl mx-auto">
-                    <!-- Item 1 -->
-                    <h2>
-                        <button type="button"
-                        class="flex justify-between items-center w-full py-4 px-5 text-left font-medium text-gray-800 bg-white border border-gray-200 hover:bg-gray-50 transition-all"
-                        data-accordion-target="#accordion-body-1"
-                        aria-expanded="false"
-                        aria-controls="accordion-body-1">
-                        <span class="font-bold"> Sala Nayeli</span>
-                        <svg data-accordion-icon class="w-4 h-4 shrink-0 transition-transform duration-300 rotate-180"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5 5 1 1 5" />
-                        </svg>
-                        </button>
-                    </h2>
-                    <div id="accordion-body-1" class="hidden transition-all overflow-hidden duration-300" aria-labelledby="accordion-heading-1">
-                        <div class="p-4 text-gray-700 border border-t-0 border-gray-200 flex flex-col items-center">
-                            <div class="w-full grid grid-cols-3 gap-4 items-center">
-                                <!-- Código y nombre -->
-                                <div class="flex flex-col items-start gap-1">
-                                    <span class="text-gray-800 font-semibold text-sm">PZ001</span>
-                                    <span class="text-gray-500 text-sm">Pieza 1</span>
-                                </div>
-
-                                <!-- Disponibilidad -->
-                                <div class="flex flex-col items-start gap-1">
-                                    <span class="text-sm text-gray-500">Disponible</span>
-                                    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-                                        10
-                                    </span>
-                                </div>
-
-                                <!-- Input -->
-                                <div>
-                                    <input type="number" id="cantidad_pieza_1" name="cantidad_pieza_1"
-                                        class="w-full text-sm rounded-lg border border-gray-300 bg-white text-gray-800 focus:ring-blue-500 focus:border-blue-500 p-2 transition"
-                                        value="0" min="0" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Item 2 -->
-                    <h2>
-                        <button type="button"
-                        class="flex justify-between items-center w-full py-4 px-5 text-left font-medium text-gray-800 bg-white border-t-0 border border-gray-200 hover:bg-gray-50 transition-all"
-                        data-accordion-target="#accordion-body-2"
-                        aria-expanded="false"
-                        aria-controls="accordion-body-2">
-                        <span>¿Qué incluye?</span>
-                        <svg data-accordion-icon class="w-4 h-4 shrink-0 transition-transform duration-300 rotate-180"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5 5 1 1 5" />
-                        </svg>
-                        </button>
-                    </h2>
-                    <div id="accordion-body-2" class="hidden transition-all overflow-hidden duration-300" aria-labelledby="accordion-heading-2">
-                        <div class="px-5 py-4 text-gray-600 border border-t-0 border-gray-200">
-                        Incluye botones, modales, formularios y más.
-                        </div>
-                    </div>
-                </div>
+            <div id="accordion" class="bg-white p-4 rounded-lg shadow-md mb-8">
+                
             </div>
+
 
         </div>
         <div class="hidden" id="settings" role="tabpanel" aria-labelledby="settings-tab">

@@ -38,7 +38,7 @@ Route::middleware(['auth'])->prefix('usuarios')->group(function () {
     Route::get('/edit/{id}', [UserController::class, 'edit'])->name('usuarios.edit');
     Route::post('/', [UserController::class, 'store'])->name('usuarios.store');
     Route::get('/datatable', [UserController::class, 'datatable'])->name('usuarios.datatable');
-    Route::delete('/{id}', [UserController::class, 'destroy'])->name('usuarios.delete');
+    Route::delete('/{sala-anexarid}', [UserController::class, 'destroy'])->name('usuarios.delete');
     Route::put('/', [UserController::class, 'update'])->name('usuarios.update');
     Route::post('/reset', [UserController::class, 'reset_pass'])->name('usuarios.reset');
 });
@@ -59,6 +59,7 @@ Route::middleware(['auth'])->prefix('piezas')->group(function () {
     Route::get('/datatable', [PiezasController::class, 'datatable'])->name('piezas.datatable');
     Route::delete('/{id}', [PiezasController::class, 'destroy'])->name('piezas.delete');
     Route::put('/', [PiezasController::class, 'update'])->name('piezas.update');
+    Route::post('/getPiezas', [PiezasController::class, 'getPiezas'])->name('piezas.getPiezas');
 });
 
 Route::middleware(['auth'])->prefix('salas')->group(function () {
@@ -68,11 +69,11 @@ Route::middleware(['auth'])->prefix('salas')->group(function () {
     Route::get('/datatable', [SalasController::class, 'datatable'])->name('salas.datatable');
     Route::delete('/{id}', [SalasController::class, 'destroy'])->name('salas.delete');
     Route::put('/', [SalasController::class, 'update'])->name('salas.update');
-    Route::post('/getPiezas', [SalasController::class, 'getPiezas'])->name('salas.getPiezas');
     Route::post('/savePiezas', [SalasController::class, 'savePiezas'])->name('salas.savePiezas');
     Route::post('/getPiezasBySala', [SalasController::class, 'getPiezasBySala'])->name('salas.getPiezasBySala');
-    Route::delete('/deletePiezid_detalleaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
+    Route::delete('/deletePiezaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
     Route::put('/updatePiezaBySala', [SalasController::class, 'updatePiezaBySala'])->name('salas.updatePiezaBySala');
+    Route::post('/getSalas', [SalasController::class, 'getSalas'])->name('salas.getSalas');
 });
 
 Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
@@ -102,8 +103,8 @@ Route::middleware(['auth'])->prefix('agrupacion-sala')->group(function () {
     Route::get('/datatable', [AgrupacionSalaController::class, 'datatable'])->name('agrupacion-sala.datatable');
     Route::get('/edit/{id}', [AgrupacionSalaController::class, 'edit'])->name('agrupacion-sala.edit');
     // Route::post('/update', [AgrupacionSalaController::class, 'update'])->name('agrupacion-sala.update');
-    // Route::post('/savePiezas', [AgrupacionSalaController::class, 'guardarDetalle'])->name('agrupacion-sala.savePiezas');
-    // Route::get('/getPiezas/{id}', [AgrupacionSalaController::class, 'cargarDetalles'])->name('agrupacion-sala.getPiezas');
+    Route::post('/saveSala', [AgrupacionSalaController::class, 'guardarDetalle'])->name('agrupacion-sala.saveSalas');
+    Route::get('/getDetalle/{id}', [AgrupacionSalaController::class, 'renderDetalle'])->name('agrupacion-sala.getDetalle');
     // Route::delete('/deletePieza/{id}', [AgrupacionSalaController::class, 'borrarDetalle'])->name('agrupacion-sala.deletePieza');
     // Route::put('/updatePieza/{id}/{cant}', [AgrupacionSalaController::class, 'actualizarDetalle'])->name('agrupacion-sala.updatePieza');
     Route::delete('/{id}', [App\Http\Controllers\AgrupacionSalaController::class, 'destroy'])->name('agrupacion-sala.delete');

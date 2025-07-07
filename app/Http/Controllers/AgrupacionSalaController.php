@@ -10,7 +10,7 @@ use App\Models\Pieza;
 use App\Models\Detalle;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Salas;
-use App\Services\MenuService;
+use App\Services\PiezasServices;
 
 class AgrupacionSalaController extends Controller
 {
@@ -225,6 +225,129 @@ class AgrupacionSalaController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Error al eliminar '.$this->getNombreDoc().', contacte con Soporte Técnico.']);
         }
+    }
+
+    public function guardarDetalle(Request $request){
+        $request->validate([
+            'id_sala' => 'required|integer',
+            'cantidad' => 'required|integer|min:1'
+        ]);
+
+        $id_enca = $request->id_enca;
+        $id_sala = $request->id_sala;
+        $cantidad = $request->cantidad;
+
+        $validarSala = Salas::find($id_sala);
+
+        if (!$validarSala) {
+            return response()->json(['success' => false, 'message' => 'Sala no encontrada.']);
+        }
+
+        $precio = DB::table('salas')->where('id_salas', $id_sala)->value('costo_cacastero');
+
+        $precioTotal = round($cantidad * $precio, 2);
+
+        $sala = new SalasController();
+        $piezas = $sala->obtenerPiezas($request->id_sala);
+
+        $AC_salida = Movimiento::where('fk_doc_afecta', $id_enca)
+            ->where('tipo_mov', $this->getTipoSalida())
+            ->first();
+
+        try {
+            DB::beginTransaction();
+
+            $detalle = new Detalle();
+            $detalle->fk_movimiento = $id_enca; // ID del movimiento
+            $detalle->fk_pieza = 0; // ID de la pieza
+            $detalle->fk_sala = $id_sala; // Asignar sala
+            $detalle->unidades = $cantidad; // Cantidad de piezas
+            $detalle->costo_unitario = $precio; // Costo unitario de la pieza
+            $detalle->costo_total = $precioTotal; // Costo total de la pieza
+            $detalle->save();
+
+            $movimiento = Movimiento::find($id_enca);
+            $total = $movimiento->totalizar();
+
+            foreach ($piezas as $pieza) {
+                $cacastero = $AC_salida->cacastero; 
+
+                $piezaService = new PiezasServices();
+                $disponibilidad = $piezaService->disPiezaByTrabajador($pieza->id_pieza, $cacastero);
+                if ($disponibilidad > $pieza->cantidad) {
+                    $detalle_salida = new Detalle();
+                    $detalle_salida->fk_movimiento = $AC_salida->id_movimiento; // ID del movimiento
+                    $detalle_salida->fk_pieza = $pieza->id_pieza; // ID de la pieza
+                    $detalle_salida->fk_sala = 0; // Asignar sala
+                    $detalle_salida->unidades = $pieza->cantidad * $cantidad; // Cantidad de piezas
+                    $detalle_salida->costo_unitario = 0; // Costo unitario de la pieza
+                    $detalle_salida->costo_total = 0; // Costo total de la pieza
+                    $detalle_salida->fk_detalle_prin = $detalle->id_detalle; // Asignar el ID del detalle principal
+                    $detalle_salida->save();
+                }
+            }
+
+            Movimiento::where('id_movimiento', $id_enca)->update(['total' => $total]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Detalle guardado con éxito.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage() ?: 'Error al guardar el detalle, contacte con Soporte Técnico.']);
+        }
+    }
+
+    public function renderDetalle($id_enca)
+    {
+        $data = [];
+        $AS_entrada = Movimiento::find($id_enca);
+        $AC_salida = Movimiento::where('fk_doc_afecta', $id_enca)
+            ->where('tipo_mov', $this->getTipoSalida())
+            ->first();
+
+        if (!$AS_entrada) {
+            return response()->json(['success' => false, 'message' => 'Movimiento de entrada no encontrado.']);
+        }
+
+        if ($AS_entrada->estado != 'A') {
+            return response()->json(['success' => false, 'message' => 'No se puede ver los detalles de una '.$this->getNombreDoc().' que no está activa.']);
+        }
+
+        if (!$AC_salida) {
+            return response()->json(['success' => false, 'message' => 'Movimiento de salida no encontrado.']);
+        }
+
+        $detalles_entrada = Detalle::with('sala')
+            ->where('fk_movimiento', $AS_entrada->id_movimiento)
+            ->get();
+
+        foreach ($detalles_entrada as $sala) {
+            $detalles_salida = Detalle::with('pieza')->where('fk_movimiento', $AC_salida->id_movimiento)->where('fk_detalle_prin', $sala->id_detalle)->get();
+
+            $data['detalles'][$sala->id_detalle] = [
+                'sala' => $sala,
+                'salidas' => $detalles_salida
+            ];
+
+        }
+
+        $detalles_disponibles = Detalle::where('fk_movimiento', $AC_salida->id_movimiento)->get();
+        $disponibilidad = [];
+
+        foreach ($detalles_disponibles as $detalle) {
+            $cacastero = $AC_salida->cacastero; 
+            $piezaService = new PiezasServices();
+            $valor = $piezaService->disPiezaByTrabajador($detalle->fk_pieza, $cacastero);
+
+            $disponibilidad[$detalle->fk_pieza] = [
+                'disponibilidad' => $valor
+            ];
+
+        }
+
+        $data['disponibilidad'] = $disponibilidad;
+
+        return  response()->json(['success' => true, 'data' => $data]);
     }
 
 

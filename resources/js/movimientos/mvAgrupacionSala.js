@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import 'jquery-ui-dist/jquery-ui.js';
 import 'jquery-ui-dist/jquery-ui.css';
 import notyf from '../../js/app.js';
+import { each } from "jquery";
 
 $(function () {
 
@@ -227,7 +228,166 @@ $(function () {
     });
 
 
-    
+    $(document).on('submit', '#frmAnexarSala', function(e) {
+        e.preventDefault();
+        var id_enca = $('#frmCrear').attr('data-id');
+        var id_sala = $('#sala-anexar').attr('data-id');
+        var cantidad = $('#cant-sala').val();
+        $.ajax({
+            url: $('meta[name="store_sala"]').attr('content'),
+            type: 'POST',
+            data: {
+                id_enca: id_enca,
+                id_sala: id_sala,
+                cantidad: cantidad
+            },
+            success: function(response) {
+                if(response.success) {
+                    notyf.success(response.message);
+                    $('#frmAnexarSala')[0].reset();
+                    $('#sala-anexar').removeAttr('data-id');
+                    // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                }else{
+                    notyf.error(response.message);
+                }
+            },error: function(xhr, status, error) {
+                // Manejo de errores
+                var responseText = xhr.responseText;
+                if (xhr.status === 422) {
+                    // Validación fallida
+                    var errors = JSON.parse(responseText);
+                    var errorMessage = '';
+                    $.each(errors.errors, function(key, value) {
+                        errorMessage += value[0] + "<br>";
+                    });
+                    responseText = errorMessage;
+                } else if (xhr.status === 500) {
+                    if(xhr.responseJSON.message){
+                        responseText = xhr.responseJSON.message;
+                    }else{
+                        responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                    }
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: responseText,
+                    showConfirmButton: true,
+                });
+            }
+        });
+    });
 
+     $('#sala-anexar').autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: $('meta[name="salas"]').attr('content'),
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    val: request.term
+                },
+                success: function(data) {
+                    response($.map(data, function(item) {
+                        return {
+                            label: item.text,
+                            value: item.text,
+                            id_sala: item.id
+                        };
+                    }));
+                }
+            });
+        },
+        minLength: 2,
+        select: function(event, ui) {
+            $(this).val(ui.item.value);
+            $(this).attr('data-id', ui.item.id_sala);
+            return false;
+        },
+        focus: function(event, ui) {
+            $(this).val(ui.item.label);
+            return false;
+        }
+    });
+
+    function renderDetalle(id) {
+        var url = $('meta[name="cargar_sala"]').attr('content').replace('__ID__', id);
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    let items = response.data.detalles;
+
+                    let html = '';
+                    $.each(items, function(index, item) {
+                        let uid = 'accordion-' + Date.now() + '-' + index;
+
+                        html += `
+                            <div class="mb-4 border border-gray-200 rounded-lg">
+                                <button
+                                    type="button"
+                                    class="accordion-button flex justify-between items-center w-full py-4 px-5 text-left font-medium text-gray-800 bg-white hover:bg-gray-700 hover:text-white transition-all"
+                                    data-target="#${uid}-content"
+                                    aria-expanded="false"
+                                >
+                                    <span class="font-bold">${item.sala.sala.nombre}</span>
+                                    <div>
+                                        <span class="inline-block bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                                            0/${item.sala.unidades}
+                                        </span>
+                                    </div>
+                                    <i class="bx bx-chevron-down w-4 h-4 shrink-0 transition-transform duration-300"></i>
+                                </button>
+
+                                <div
+                                    id="${uid}-content"
+                                    class="accordion-content hidden px-5 py-4 text-gray-700 border-t border-gray-200"
+                                >
+                                    <p class="text-sm text-gray-500">Sin piezas aún</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    $('#accordion').html(html);
+
+                    // Activar comportamiento de acordeón
+                    $('.accordion-button').off('click').on('click', function () {
+                        const targetSelector = $(this).data('target');
+                        const $target = $(targetSelector);
+                        const isVisible = $target.is(':visible');
+
+                        // Cerrar todos los acordeones
+                        $('.accordion-content').slideUp();
+                        $('.accordion-button').attr('aria-expanded', 'false')
+                            .removeClass('bg-gray-700 text-white')
+                            .addClass('bg-white text-gray-800');
+                        $('.accordion-button i').removeClass('rotate-180');
+
+                        // Si estaba cerrado, abrirlo y aplicar estilos de activo
+                        if (!isVisible) {
+                            $target.slideDown();
+                            $(this).attr('aria-expanded', 'true')
+                                .removeClass('bg-white text-gray-800')
+                                .addClass('bg-gray-700 text-white');
+                            $(this).find('i').addClass('rotate-180');
+                        }
+                    });
+
+                } else {
+                    notyf.error(response.message);
+                }
+            },
+            error: function() {
+                notyf.error('Error al cargar los detalles de la sala.');
+            }
+        });
+    }
+
+    if($('[name="action"]').attr('content') == "editar"){
+        renderDetalle($('#frmCrear').attr('data-id'));
+    }
 
 });
