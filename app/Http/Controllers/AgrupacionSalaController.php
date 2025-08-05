@@ -11,6 +11,7 @@ use App\Models\Detalle;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Salas;
 use App\Services\PiezasServices;
+use App\Http\Controllers\SalasController;
 
 class AgrupacionSalaController extends Controller
 {
@@ -269,24 +270,6 @@ class AgrupacionSalaController extends Controller
             $movimiento = Movimiento::find($id_enca);
             $total = $movimiento->totalizar();
 
-            foreach ($piezas as $pieza) {
-                $cacastero = $AC_salida->cacastero; 
-
-                $piezaService = new PiezasServices();
-                $disponibilidad = $piezaService->disPiezaByTrabajador($pieza->id_pieza, $cacastero);
-                if ($disponibilidad > $pieza->cantidad) {
-                    $detalle_salida = new Detalle();
-                    $detalle_salida->fk_movimiento = $AC_salida->id_movimiento; // ID del movimiento
-                    $detalle_salida->fk_pieza = $pieza->id_pieza; // ID de la pieza
-                    $detalle_salida->fk_sala = 0; // Asignar sala
-                    $detalle_salida->unidades = $pieza->cantidad * $cantidad; // Cantidad de piezas
-                    $detalle_salida->costo_unitario = 0; // Costo unitario de la pieza
-                    $detalle_salida->costo_total = 0; // Costo total de la pieza
-                    $detalle_salida->fk_detalle_prin = $detalle->id_detalle; // Asignar el ID del detalle principal
-                    $detalle_salida->save();
-                }
-            }
-
             Movimiento::where('id_movimiento', $id_enca)->update(['total' => $total]);
 
             DB::commit();
@@ -321,7 +304,10 @@ class AgrupacionSalaController extends Controller
             ->where('fk_movimiento', $AS_entrada->id_movimiento)
             ->get();
 
+        $disponibilidad = [];
+
         foreach ($detalles_entrada as $sala) {
+
             $detalles_salida = Detalle::with('pieza')->where('fk_movimiento', $AC_salida->id_movimiento)->where('fk_detalle_prin', $sala->id_detalle)->get();
 
             $data['detalles'][$sala->id_detalle] = [
@@ -329,25 +315,239 @@ class AgrupacionSalaController extends Controller
                 'salidas' => $detalles_salida
             ];
 
+            $detallesRequeridos = new SalasController();
+            $detallesRequeridos = $detallesRequeridos->obtenerPiezas($sala->fk_sala);
+
+            $data['detalles'][$sala->id_detalle]['requeridos'] = $detallesRequeridos;
+
+            $salas_posibles = [];
+
+            foreach ($detallesRequeridos as $pieza){
+                $cacastero = $AC_salida->cacastero; 
+                $piezaService = new PiezasServices();
+                $valor = $piezaService->disPiezaByTrabajador($pieza->id_pieza, $cacastero);
+
+                $disponibilidad[$pieza->id_pieza] = [
+                    'disponibilidad' => $valor,
+                    'pieza' => $pieza->id_pieza
+                ];
+                //validar si ya armo al menos una sala
+                $detalle_pieza = collect($detalles_salida)->where('fk_pieza', $pieza->id_pieza)->first();
+
+                $unidades_entregadas = $detalle_pieza ? $detalle_pieza->unidades : 0;
+
+                $cantidad_por_sala = $pieza->cantidad; // esto viene del objeto 'requerido'
+                if ($cantidad_por_sala > 0) {
+                    $salas_con_esta_pieza = floor($unidades_entregadas / $cantidad_por_sala);
+                } else {
+                    $salas_con_esta_pieza = 0;
+                }
+
+                $salas_posibles[] = $salas_con_esta_pieza;
+            }
+
+            $armadas = count($salas_posibles) > 0 ? min($salas_posibles) : 0;
+            $data['detalles'][$sala->id_detalle]['armadas'] = $armadas;
+
         }
-
-        $detalles_disponibles = Detalle::where('fk_movimiento', $AC_salida->id_movimiento)->get();
-        $disponibilidad = [];
-
-        foreach ($detalles_disponibles as $detalle) {
-            $cacastero = $AC_salida->cacastero; 
-            $piezaService = new PiezasServices();
-            $valor = $piezaService->disPiezaByTrabajador($detalle->fk_pieza, $cacastero);
-
-            $disponibilidad[$detalle->fk_pieza] = [
-                'disponibilidad' => $valor
-            ];
-
-        }
-
         $data['disponibilidad'] = $disponibilidad;
-
         return  response()->json(['success' => true, 'data' => $data]);
+    }
+
+    public function sumar(Request $request)
+    {
+        $id = $request->id;
+        $pieza = $request->pieza;
+        $detalle = $request->detalle;
+        try{
+            DB::beginTransaction();
+            $detalle_entrada = Detalle::find($detalle);
+            if(!$detalle_entrada) {
+                return response()->json(['success' => false, 'message' => 'Detalle de entrada no encontrado.']);
+            }
+            $enca_salida = Movimiento::where('fk_doc_afecta', $detalle_entrada->fk_movimiento)->first();
+            if(!$enca_salida) {
+                return response()->json(['success' => false, 'message' => 'Movimiento de salida no encontrado.']);
+            }
+            $sala = Salas::find($detalle_entrada->fk_sala);
+            if(!$sala) {
+                return response()->json(['success' => false, 'message' => 'Sala no encontrada .']);
+            }
+            $requerido = DB::table('salas_piezas')->where('id_sala', $sala->id_salas)->where('id_pieza', $pieza)->first()->cantidad;
+            if($detalle_entrada->unidades > 1) {
+                $requerido = $requerido * $detalle_entrada->unidades;
+            }
+            $detalle_salida = Detalle::find($id);
+
+            $cacastero = $enca_salida->cacastero; // Obtener el ID del carpintero del movimiento de salida
+            $piezaService = new PiezasServices();
+
+            $valor = $piezaService->disPiezaByTrabajador($pieza, $cacastero);
+
+            if($valor <= 0){
+                return response()->json(['success' => false, 'message' => 'No hay piezas disponibles para agregar a la sala.']);
+            }
+
+            if($detalle_salida){
+                
+                if($requerido <= $detalle_salida->unidades){
+                    return response()->json(['success' => false, 'message' => 'No se puede agregar más piezas a la sala, ya se ha alcanzado el máximo requerido.']);
+                }else{
+                    $detalle_salida->unidades += 1;
+                    $detalle_salida->costo_total = ($detalle_salida->unidades * $detalle_salida->costo_unitario);
+                    $detalle_salida->save();
+                    $movimiento = Movimiento::find($enca_salida->id_movimiento);
+                    $total = $movimiento->totalizar();
+                    Movimiento::where('id_movimiento', $enca_salida->id_movimiento)->update(['total' => $total]);
+                }
+            }else{                
+                $detalle_salida = new Detalle();
+                $detalle_salida->fk_movimiento =  $enca_salida->id_movimiento; // ID del movimiento
+                $detalle_salida->fk_pieza = $pieza; // ID de la pieza
+                $detalle_salida->fk_sala = null; // Asignar sala
+                $detalle_salida->unidades = 1; // Cantidad de piezas
+                $detalle_salida->costo_unitario = Pieza::where('id_pieza', $pieza)->first()->costo_cacastero; // Costo unitario de la pieza
+                $detalle_salida->costo_total = $detalle_salida->costo_unitario; // Costo total de la pieza
+                $detalle_salida->fk_detalle_prin = $detalle_entrada->id_detalle; // Asignar el detalle de entrada principal
+                $detalle_salida->save();
+                $movimiento = Movimiento::find($enca_salida->id_movimiento);
+                $total = $movimiento->totalizar();
+                Movimiento::where('id_movimiento', $enca_salida->id_movimiento)->update(['total' => $total]);
+            }
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Pieza agregada con éxito.', 'total' => $total]);
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function restar(Request $request)
+    {
+        $id = $request->id;
+        $pieza = $request->pieza;
+        $detalle = $request->detalle;
+        try{
+            DB::beginTransaction();
+           
+            $detalle_entrada = Detalle::find($detalle);
+            if(!$detalle_entrada) {
+                return response()->json(['success' => false, 'message' => 'Detalle de entrada no encontrado.']);
+            }
+            $enca_salida = Movimiento::where('fk_doc_afecta', $detalle_entrada->fk_movimiento)->first();
+            if(!$enca_salida) {
+                return response()->json(['success' => false, 'message' => 'Movimiento de salida no encontrado.']);
+            }
+            $sala = Salas::find($detalle_entrada->fk_sala);
+            if(!$sala) {
+                return response()->json(['success' => false, 'message' => 'Sala no encontrada .']);
+            }
+            $requerido = DB::table('salas_piezas')->where('id_sala', $sala->id_salas)->where('id_pieza', $pieza)->first()->cantidad;
+            if($detalle_entrada->unidades > 1) {
+                $requerido = $requerido * $detalle_entrada->unidades;
+            }
+            $detalle_salida = Detalle::find($id);
+
+            if(!$detalle_salida) {
+                return response()->json(['success' => false, 'message' => 'No puede ser negativo el valor en piezas.']);
+            }
+
+            if($detalle_salida->unidades == 1){
+                $detalle_salida->delete();
+                $movimiento = Movimiento::find($enca_salida->id_movimiento);
+                $total = $movimiento->totalizar();
+                Movimiento::where('id_movimiento', $enca_salida->id_movimiento)->update(['total' => $total]);
+            }else if($detalle_salida->unidades > 1){
+                $detalle_salida->unidades -= 1;
+                $detalle_salida->costo_total = ($detalle_salida->costo_unitario * $detalle_salida->unidades);
+                $detalle_salida->save();
+                $movimiento = Movimiento::find($enca_salida->id_movimiento);
+                $total = $movimiento->totalizar();
+                Movimiento::where('id_movimiento', $enca_salida->id_movimiento)->update(['total' => $total]);
+            }else{
+                return response()->json(['success' => false, 'message' => 'No se puede restar más piezas a la sala, ya se ha alcanzado el mínimo requerido.']);
+            }
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Pieza restada con éxito.', 'total' => $total]);
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function eliminarDetalle($id_det)
+    {
+        $id = $id_det;
+        try {
+            DB::beginTransaction();
+            $detalle = Detalle::find($id);
+            if (!$detalle) {
+                return response()->json(['success' => false, 'message' => 'Detalle no encontrado.']);
+            }
+
+            $enca_salida = Movimiento::where('fk_doc_afecta', $detalle->fk_movimiento)->first();
+            if (!$enca_salida) {
+                return response()->json(['success' => false, 'message' => 'Movimiento de salida no encontrado.']);
+            }
+
+            foreach ($enca_salida->detalles as $detalle_salida) {
+                if ($detalle_salida->fk_detalle_prin == $detalle->id_detalle) {
+                    $detalle_salida->delete();
+                }
+            }
+
+            $detalle->delete();
+
+            $movimiento = Movimiento::find($enca_salida->id_movimiento);
+            $total = $movimiento->totalizar();
+            Movimiento::where('id_movimiento', $enca_salida->id_movimiento)->update(['total' => $total]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Detalle eliminado con éxito.', 'total' => $total]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el detalle: ' . $e->getMessage()]);
+        }
+    }
+
+    public function renderResumen($id_enca){
+
+        $data = [];
+
+        $entrada = Movimiento::find($id_enca);
+        if(!$entrada) {
+            return response()->json(['success' => false, 'message' => 'Movimiento de entrada no encontrado.']);
+        }
+
+        $salida = Movimiento::where('fk_doc_afecta', $id_enca)
+            ->first();
+
+        if(!$salida) {
+            return response()->json(['success' => false, 'message' => 'Movimiento de salida no encontrado.']);
+        }
+
+        $data['entrada'] = $entrada;
+        $data['salida'] = $salida;
+
+        $detalles_entrada = Detalle::with('sala')
+            ->where('fk_movimiento', $entrada->id_movimiento)
+            ->get();
+
+        $data['detalles_entrada'] = $detalles_entrada;
+
+        $detalles_salida = Detalle::with('pieza')
+            ->where('fk_movimiento', $salida->id_movimiento)
+            ->get();
+
+        $data['detalles_salida'] = $detalles_salida;
+
+        $total_entrada = $entrada->totalizar();
+        $total_salida = $salida->totalizar();
+
+        Movimiento::where('id_movimiento', $entrada->id_movimiento)->update(['total' => $total_entrada]);
+        Movimiento::where('id_movimiento', $salida->id_movimiento)->update(['total' => $total_salida]);
+
+        return response()->json(['success' => true, 'data' => $data]);
     }
 
 

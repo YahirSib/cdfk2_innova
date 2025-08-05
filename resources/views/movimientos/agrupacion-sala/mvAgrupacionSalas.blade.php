@@ -11,13 +11,12 @@
 <meta name="store_sala" content="{{ route('agrupacion-sala.saveSalas') }}">
 <meta name="cargar_sala" content="{{ route('agrupacion-sala.getDetalle', ['id' => '__ID__']) }}">
 <meta name="action" content="{{ $data['action'] }}">
-{{-- 
-<meta name="delete_pieza" content="{{ route('agrupacion-sala.deletePieza', ['id' => '__ID__']) }}">
-<meta name="update_pieza" content="{{ route('agrupacion-sala.updatePieza', ['id' => '__ID__', 'cant' => '__CANT__']) }}">
-<meta name="print" content="{{ route('agrupacion-sala.print_preliminar', ['id' => '__ID__']) }}">
-<meta name="print_real" content="{{ route('agrupacion-sala.print_final', ['id' => '__ID__']) }}"> --}}
+<meta name="sumar" content="{{ route('agrupacion-sala.sumar') }}">
+<meta name="restar" content="{{ route('agrupacion-sala.restar') }}">
 <meta name="redirect" content="{{ route('agrupacion-sala.index') }}">
 <meta name="meses-url" content="{{ route('agrupacion-sala.meses') }}">
+<meta name="eliminar-detalle" content="{{ route('agrupacion-sala.eliminarDetalle', ['id' => '__ID__']) }}">
+<meta name="resumen" content="{{ route('agrupacion-sala.resumen', ['id' => '__ID__']) }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4 flex justify-between">
@@ -107,21 +106,17 @@
 
             </form>
 
-            <div id="accordion" class="bg-white p-4 rounded-lg shadow-md mb-8">
+            <div id="accordion" class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-col gap-4 md:flex-row md:flex-wrap">
                 
             </div>
 
 
         </div>
         <div class="hidden" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-            <div class="flex flex-col md:flex-row gap-4 flex-wrap mb-4" id="divPiezas">
+            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col md:flex-row gap-4 flex-wrap mb-4" id="resumen_sala">
                 
             </div>
-            <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="sm:w-auto w-full sm:text-left text-center">
-                    <h1 class="text-gray-600 text-sm">Total de Piezas:</h1>
-                    <span id="totalPiezas" class="text-2xl font-bold text-gray-800">0</span>
-                </div>
+            <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-end gap-4">
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-2 w-full sm:w-auto">
                     <a id="btnImprimirPre" class="cursor-pointer inline-flex w-full sm:w-auto justify-center items-center gap-2 bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-600 transition">
                         <i class='bx bxs-printer text-xl'></i>

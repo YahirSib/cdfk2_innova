@@ -102,17 +102,14 @@ Route::middleware(['auth'])->prefix('agrupacion-sala')->group(function () {
     Route::post('/', [AgrupacionSalaController::class, 'store'])->name('agrupacion-sala.store');
     Route::get('/datatable', [AgrupacionSalaController::class, 'datatable'])->name('agrupacion-sala.datatable');
     Route::get('/edit/{id}', [AgrupacionSalaController::class, 'edit'])->name('agrupacion-sala.edit');
-    // Route::post('/update', [AgrupacionSalaController::class, 'update'])->name('agrupacion-sala.update');
     Route::post('/saveSala', [AgrupacionSalaController::class, 'guardarDetalle'])->name('agrupacion-sala.saveSalas');
     Route::get('/getDetalle/{id}', [AgrupacionSalaController::class, 'renderDetalle'])->name('agrupacion-sala.getDetalle');
-    // Route::delete('/deletePieza/{id}', [AgrupacionSalaController::class, 'borrarDetalle'])->name('agrupacion-sala.deletePieza');
-    // Route::put('/updatePieza/{id}/{cant}', [AgrupacionSalaController::class, 'actualizarDetalle'])->name('agrupacion-sala.updatePieza');
     Route::delete('/{id}', [App\Http\Controllers\AgrupacionSalaController::class, 'destroy'])->name('agrupacion-sala.delete');
-    // Route::get('/print/{id}', [AgrupacionSalaController::class, 'imprimirPreliminar'])->name('agrupacion-sala.print_preliminar');
-    // Route::get('/print-final/{id}', [AgrupacionSalaController::class, 'imprimirFinal'])->name('agrupacion-sala.print_final');
-    // Route::get('/print-historico/{id}', [AgrupacionSalaController::class, 'imprimirHistorico'])->name('agrupacion-sala.print_historico');
-    // Route::get('/print-anulada/{id}', [AgrupacionSalaController::class, 'imprimirAnular'])->name('agrupacion-sala.print_anulada');
     Route::get('nota-pieza/meses', [AgrupacionSalaController::class, 'obtenerMeses'])->name('agrupacion-sala.meses');
+    Route::post('/sumar', [AgrupacionSalaController::class, 'sumar'])->name('agrupacion-sala.sumar');
+    Route::post('/restar', [AgrupacionSalaController::class, 'restar'])->name('agrupacion-sala.restar');
+    Route::delete('/eliminar-detalle/{id}', [AgrupacionSalaController::class, 'eliminarDetalle'])->name('agrupacion-sala.eliminarDetalle');
+    Route::get('/resumen/{id}', [AgrupacionSalaController::class, 'renderResumen'])->name('agrupacion-sala.resumen');
 });
 
 
