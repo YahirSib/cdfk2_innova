@@ -320,7 +320,6 @@ class NotaPiezaController extends Controller
 
     public function imprimirPreliminar($id)
     {
-        
         $data = [];
         $data['title'] = strtoupper( $this->nombre_doc . ' PRELIMINAR');
         $notaPieza = Movimiento::find($id);

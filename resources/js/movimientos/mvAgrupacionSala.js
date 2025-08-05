@@ -731,4 +731,105 @@ $(function () {
         });
     });
 
+    $(document).on('click', '#btnImprimirPre', function (e) {
+        e.preventDefault();
+        var id = $('#frmCrear').attr('data-id');
+        var basePrintUrl = $('meta[name="imprimir-preliminar"]').attr('content');
+        let finalUrl = basePrintUrl.replace('__ID__', id);
+        let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+            return;
+        }
+    });
+
+    $(document).on('click', '#btnImprimir', function (e) {
+        e.preventDefault();
+        var detalles = $('.accordion-button');
+        var allComplete = false;
+
+        detalles.each(function() {
+            var status = $(this).attr('data-status');
+            if (status === 'false') {
+                allComplete = false;
+                return false;
+            } else {
+                allComplete = true;
+            }
+        });
+
+        if(allComplete){
+            Swal.fire({
+                title: '¿Está seguro de imprimir esta agrupación de sala?',
+                text: 'Esta acción generará un documento PDF con los detalles de la agrupación que no se podrá revertir.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Imprimir'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var id = $('#frmCrear').attr('data-id');
+                    var basePrintUrl = $('meta[name="imprimir"]').attr('content');
+                    let finalUrl = basePrintUrl.replace('__ID__', id);
+                    var redirectUrl = $('meta[name="redirect"]').attr('content'); // Asegúrate que este meta exista
+                    // Abrir como ventana emergente
+                    let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+                    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                        Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+                        return;
+                    }
+                    // Redirige luego de un pequeño retraso
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1000); // Puedes ajustar el tiempo si lo deseas
+                }
+            });
+        }else{
+            Swal.fire('Error', 'No se puede imprimir, hay detalles de sala incompletos.', 'error');
+        } 
+    });
+
+    $(document).on( 'click' ,'.btnReporte', function(e){
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        var basePrintUrl = $('meta[name="imprimir-historico"]').attr('content');
+        let finalUrl = basePrintUrl.replace('__ID__', id);
+        // Abrir como ventana emergente
+        let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+            return;
+        }
+    });
+
+    $(document).on('click', '.btnAnular', function(e){
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        Swal.fire({
+            title: '¿Está seguro de anular esta agrupación de sala?',
+            text: 'Esta acción generará un documento PDF de anulación con los detalles de la agrupación que no se podrá revertir.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Anular'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var basePrintUrl = $('meta[name="anular"]').attr('content');
+                let finalUrl = basePrintUrl.replace('__ID__', id);
+                // Abrir como ventana emergente
+                let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
+
+                $('#tblSalas').DataTable().ajax.reload();
+
+                if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+                    Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
+                    return;
+                }
+            }
+        }); 
+    });
+
 });

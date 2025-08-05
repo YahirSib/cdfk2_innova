@@ -5,7 +5,6 @@
 @section('content')
 
 <meta name="store" content="{{ route('agrupacion-sala.store') }}">
-{{-- <meta name="update" content="{{ route('agrupacion-sala.update') }}"> --}}
 <meta name="piezas" content="{{ route('piezas.getPiezas') }}">
 <meta name="salas" content="{{ route('salas.getSalas') }}">
 <meta name="store_sala" content="{{ route('agrupacion-sala.saveSalas') }}">
@@ -17,6 +16,8 @@
 <meta name="meses-url" content="{{ route('agrupacion-sala.meses') }}">
 <meta name="eliminar-detalle" content="{{ route('agrupacion-sala.eliminarDetalle', ['id' => '__ID__']) }}">
 <meta name="resumen" content="{{ route('agrupacion-sala.resumen', ['id' => '__ID__']) }}">
+<meta name="imprimir-preliminar" content="{{ route('agrupacion-sala.imprimirPreliminar', ['id' => '__ID__']) }}">
+<meta name="imprimir" content="{{ route('agrupacion-sala.imprimirFinal', ['id' => '__ID__']) }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4 flex justify-between">

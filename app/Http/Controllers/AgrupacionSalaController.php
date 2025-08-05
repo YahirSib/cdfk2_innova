@@ -47,6 +47,14 @@ class AgrupacionSalaController extends Controller
         return $this->nombre_doc;
     }
 
+    public function renderPDF($entrada, $detalles_entrada, $detalles_salida, $total_entrada, $total_salida, $data){
+        ini_set('memory_limit', '512M');
+        $pdf = Pdf::loadView('movimientos.agrupacion-sala.pdfAS', compact('entrada', 'detalles_entrada', 'detalles_salida', 'total_entrada', 'total_salida', 'data'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->stream('agrupacion_sala' . $entrada->correlativo . '.pdf');
+    }
+
     public function index()
     {
         return view('movimientos.agrupacion-sala.mvCargarSalas', ['menu' => $this->getMenu()]);
@@ -550,5 +558,144 @@ class AgrupacionSalaController extends Controller
         return response()->json(['success' => true, 'data' => $data]);
     }
 
+    public function imprimirPreliminar($id){
+        $data = [];
+        $data['title'] = strtoupper( $this->nombre_doc . ' PRELIMINAR');
+        $entrada = Movimiento::find($id);
+        $data['entrada'] = $entrada;
+        $data['correlativo'] = $entrada->correlativo_formateado;
+        $data['fecha_ingreso'] = $entrada->fecha_ingreso_formateada;
+        $data['cacastero'] = $entrada->nombre_cacastero;
+        $detalles_entrada = $entrada->detalles()->with('sala')->get();
+        $total_entrada = $entrada->totalizar();
+
+        $salida = Movimiento::where('fk_doc_afecta', $id)
+            ->where('tipo_mov', $this->getTipoSalida())
+            ->first();
+
+        $data['salida'] = $salida;
+        $detalles_salida = $salida->detalles()->with('pieza')->get();
+        $total_salida = $salida->totalizar();
+
+        return $this->renderPDF($entrada, $detalles_entrada, $detalles_salida, $total_entrada, $total_salida, $data);
+    }
+
+    public function imprimirFinal($id){
+        try {
+            DB::beginTransaction();
+            $data = [];
+            $data['title'] = strtoupper( $this->nombre_doc );
+            $entrada = Movimiento::find($id);
+            $data['entrada'] = $entrada;
+            $data['correlativo'] = $entrada->correlativo_formateado;
+            $data['fecha_ingreso'] = $entrada->fecha_ingreso_formateada;
+            $data['cacastero'] = $entrada->nombre_cacastero;
+            $detalles_entrada = $entrada->detalles()->with('sala')->get();
+            $total_entrada = $entrada->totalizar();
+            $salida = Movimiento::where('fk_doc_afecta', $id)
+                ->where('tipo_mov', $this->getTipoSalida())
+                ->first();
+            $data['salida'] = $salida;
+            $detalles_salida = $salida->detalles()->with('pieza')->get();
+            $total_salida = $salida->totalizar();
+
+            $entrada->estado = 'I'; // Cambiar el estado a Inactivo
+            $entrada->fecha_impresion = now(); 
+            $entrada->save();
+            $salida->estado = 'I'; // Cambiar el estado a Inactivo
+            $salida->fecha_impresion = now();
+            $salida->save();
+
+            foreach ($detalles_entrada as $detalle) {
+                $id_sala = $detalle->fk_sala;
+                $sala = Salas::find($id_sala);
+                $sala->existencia = $sala->totalizarExistencias();
+                $sala->save();
+            }
+
+            foreach ($detalles_salida as $detalle) {
+                $id_pieza = $detalle->fk_pieza;
+                $pieza = Pieza::find($id_pieza);
+                $pieza->existencia = $pieza->totalizarExistencias();
+                $pieza->save();
+            }
+            DB::commit();
+            return $this->renderPDF($entrada, $detalles_entrada, $detalles_salida, $total_entrada, $total_salida, $data);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al iniciar la transacción: ' . $e->getMessage()]);
+        }
+    }
+
+    public function imprimirHistorico($id){
+        $data = [];
+        $entrada = Movimiento::find($id);
+        if($entrada->estado == "I"){
+            $data['title'] = strtoupper($this->nombre_doc . ' HISTORICA');
+        }else{
+            $data['title'] = strtoupper($this->nombre_doc . ' ANULADA');
+        }
+
+        $data['entrada'] = $entrada;
+        $data['correlativo'] = $entrada->correlativo_formateado;
+        $data['fecha_ingreso'] = $entrada->fecha_ingreso_formateada;
+        $data['cacastero'] = $entrada->nombre_cacastero;
+        $detalles_entrada = $entrada->detalles()->with('sala')->get();
+        $total_entrada = $entrada->totalizar();
+
+        $salida = Movimiento::where('fk_doc_afecta', $id)
+            ->where('tipo_mov', $this->getTipoSalida())
+            ->first();
+
+        $data['salida'] = $salida;
+        $detalles_salida = $salida->detalles()->with('pieza')->get();
+        $total_salida = $salida->totalizar();
+        return $this->renderPDF($entrada, $detalles_entrada, $detalles_salida, $total_entrada, $total_salida, $data);
+    }
+
+    public function imprimirAnular($id){
+        try {
+            DB::beginTransaction();
+            $data = [];
+            $data['title'] = strtoupper($this->nombre_doc . ' ANULADA');
+            $entrada = Movimiento::find($id);
+            $data['entrada'] = $entrada;
+            $data['correlativo'] = $entrada->correlativo_formateado;
+            $data['fecha_ingreso'] = $entrada->fecha_ingreso_formateada;
+            $data['cacastero'] = $entrada->nombre_cacastero;
+            $detalles_entrada = $entrada->detalles()->with('sala')->get();
+            $total_entrada = $entrada->totalizar();
+            $salida = Movimiento::where('fk_doc_afecta', $id)
+                ->where('tipo_mov', $this->getTipoSalida())
+                ->first();
+            $data['salida'] = $salida;
+            $detalles_salida = $salida->detalles()->with('pieza')->get();
+            $total_salida = $salida->totalizar();
+
+            $entrada->estado = 'Z'; // Cambiar el estado a Anulado
+            $entrada->fecha_anulacion = now(); 
+            $entrada->save();
+            $salida->estado = 'Z'; // Cambiar el estado a Anulado
+            $salida->fecha_anulacion = now();
+            $salida->save();
+
+            foreach ($detalles_entrada as $detalle) {
+                $id_sala = $detalle->fk_sala;
+                $sala = Salas::find($id_sala);
+                $sala->existencia = $sala->totalizarExistencias();
+                $sala->save();
+            }
+
+            foreach ($detalles_salida as $detalle) {
+                $id_pieza = $detalle->fk_pieza;
+                $pieza = Pieza::find($id_pieza);
+                $pieza->existencia = $pieza->totalizarExistencias();
+                $pieza->save();
+            }
+            DB::commit();
+            return $this->renderPDF($entrada, $detalles_entrada, $detalles_salida, $total_entrada, $total_salida, $data);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al iniciar la transacción: ' . $e->getMessage()]);
+        }
+    }
 
 }

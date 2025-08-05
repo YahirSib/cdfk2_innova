@@ -110,6 +110,10 @@ Route::middleware(['auth'])->prefix('agrupacion-sala')->group(function () {
     Route::post('/restar', [AgrupacionSalaController::class, 'restar'])->name('agrupacion-sala.restar');
     Route::delete('/eliminar-detalle/{id}', [AgrupacionSalaController::class, 'eliminarDetalle'])->name('agrupacion-sala.eliminarDetalle');
     Route::get('/resumen/{id}', [AgrupacionSalaController::class, 'renderResumen'])->name('agrupacion-sala.resumen');
+    Route::get('/imprimir-preliminar/{id}', [AgrupacionSalaController::class, 'imprimirPreliminar'])->name('agrupacion-sala.imprimirPreliminar');
+    Route::get('/imprimir-final/{id}', [AgrupacionSalaController::class, 'imprimirFinal'])->name('agrupacion-sala.imprimirFinal');
+    Route::get('/imprimir-historico/{id}', [AgrupacionSalaController::class, 'imprimirHistorico'])->name('agrupacion-sala.imprimirHistorico');
+    Route::get('/imprimir-anulada/{id}', [AgrupacionSalaController::class, 'imprimirAnular'])->name('agrupacion-sala.imprimirAnular');
 });
 
 

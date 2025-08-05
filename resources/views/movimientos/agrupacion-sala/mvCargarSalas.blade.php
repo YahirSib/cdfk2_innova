@@ -6,11 +6,9 @@
 
 <meta name="datatable" content="{{ route('agrupacion-sala.datatable') }}">
 <meta name="delete" content="{{ route('agrupacion-sala.delete', ['id' => '__ID__']) }}">
-{{-- 
-<meta name="action" content = "ver">
-<meta name="print_historico" content="{{ route('agrupacion-sala.print_historico', ['id' => '__ID__']) }}">
-<meta name="print_anulada" content="{{ route('agrupacion-sala.print_anulada', ['id' => '__ID__']) }}"> --}}
+<meta name="imprimir-historico" content="{{ route('agrupacion-sala.imprimirHistorico', ['id' => '__ID__']) }}">
 <meta name="meses-url" content="{{ route('agrupacion-sala.meses') }}">
+<meta name="anular" content="{{ route('agrupacion-sala.imprimirAnular', ['id' => '__ID__']) }}">
 
 <div class="container w-full p-4">
     <div class="w-full mb-4">
