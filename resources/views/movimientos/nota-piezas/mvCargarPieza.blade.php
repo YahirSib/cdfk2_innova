@@ -6,7 +6,7 @@
 
 <meta name="store" content="{{ route('nota-pieza.store') }}">
 <meta name="update" content="{{ route('nota-pieza.update') }}">
-<meta name="piezas" content="{{ route('salas.getPiezas') }}">
+<meta name="piezas" content="{{ route('piezas.getPiezas') }}">
 <meta name="store_pieza" content="{{ route('nota-pieza.savePiezas') }}">
 <meta name="cargar_pieza" content="{{ route('nota-pieza.getPiezas', ['id' => '__ID__']) }}">
 <meta name="action" content="{{ $data['action'] }}">

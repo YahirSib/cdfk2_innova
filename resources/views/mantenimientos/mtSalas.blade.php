@@ -9,7 +9,7 @@
 <meta name="delete" content="{{ route('salas.delete', ['id' => '__ID__']) }}">
 <meta name="store" content="{{ route('salas.store') }}">
 <meta name="update" content="{{ route('salas.update')}}">
-<meta name="piezas" content="{{ route('salas.getPiezas') }}">
+<meta name="piezas" content="{{ route('piezas.getPiezas') }}">
 <meta name="store_pieza" content="{{ route('salas.savePiezas') }}">
 <meta name="piezas_sala" content="{{ route('salas.getPiezasBySala') }}">
 <meta name="delete_pieza" content="{{ route('salas.deletePiezaBySala', ['id' => '__ID__']) }}">

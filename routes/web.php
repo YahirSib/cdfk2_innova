@@ -38,7 +38,7 @@ Route::middleware(['auth'])->prefix('usuarios')->group(function () {
     Route::get('/edit/{id}', [UserController::class, 'edit'])->name('usuarios.edit');
     Route::post('/', [UserController::class, 'store'])->name('usuarios.store');
     Route::get('/datatable', [UserController::class, 'datatable'])->name('usuarios.datatable');
-    Route::delete('/{id}', [UserController::class, 'destroy'])->name('usuarios.delete');
+    Route::delete('/{sala-anexarid}', [UserController::class, 'destroy'])->name('usuarios.delete');
     Route::put('/', [UserController::class, 'update'])->name('usuarios.update');
     Route::post('/reset', [UserController::class, 'reset_pass'])->name('usuarios.reset');
 });
@@ -59,6 +59,7 @@ Route::middleware(['auth'])->prefix('piezas')->group(function () {
     Route::get('/datatable', [PiezasController::class, 'datatable'])->name('piezas.datatable');
     Route::delete('/{id}', [PiezasController::class, 'destroy'])->name('piezas.delete');
     Route::put('/', [PiezasController::class, 'update'])->name('piezas.update');
+    Route::post('/getPiezas', [PiezasController::class, 'getPiezas'])->name('piezas.getPiezas');
 });
 
 Route::middleware(['auth'])->prefix('salas')->group(function () {
@@ -68,11 +69,11 @@ Route::middleware(['auth'])->prefix('salas')->group(function () {
     Route::get('/datatable', [SalasController::class, 'datatable'])->name('salas.datatable');
     Route::delete('/{id}', [SalasController::class, 'destroy'])->name('salas.delete');
     Route::put('/', [SalasController::class, 'update'])->name('salas.update');
-    Route::post('/getPiezas', [SalasController::class, 'getPiezas'])->name('salas.getPiezas');
     Route::post('/savePiezas', [SalasController::class, 'savePiezas'])->name('salas.savePiezas');
     Route::post('/getPiezasBySala', [SalasController::class, 'getPiezasBySala'])->name('salas.getPiezasBySala');
-    Route::delete('/deletePiezid_detalleaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
+    Route::delete('/deletePiezaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
     Route::put('/updatePiezaBySala', [SalasController::class, 'updatePiezaBySala'])->name('salas.updatePiezaBySala');
+    Route::post('/getSalas', [SalasController::class, 'getSalas'])->name('salas.getSalas');
 });
 
 Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
@@ -98,19 +99,21 @@ Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
 Route::middleware(['auth'])->prefix('agrupacion-sala')->group(function () {
     Route::get('/', [AgrupacionSalaController::class, 'index'])->name('agrupacion-sala.index');
     Route::get('/create', [AgrupacionSalaController::class, 'create'])->name('agrupacion-sala.create');
-    // Route::post('/', [AgrupacionSalaController::class, 'store'])->name('agrupacion-sala.store');
-    // Route::get('/datatable', [AgrupacionSalaController::class, 'datatable'])->name('agrupacion-sala.datatable');
-    // Route::get('/edit/{id}', [AgrupacionSalaController::class, 'edit'])->name('agrupacion-sala.edit');
-    // Route::post('/update', [AgrupacionSalaController::class, 'update'])->name('agrupacion-sala.update');
-    // Route::post('/savePiezas', [AgrupacionSalaController::class, 'guardarDetalle'])->name('agrupacion-sala.savePiezas');
-    // Route::get('/getPiezas/{id}', [AgrupacionSalaController::class, 'cargarDetalles'])->name('agrupacion-sala.getPiezas');
-    // Route::delete('/deletePieza/{id}', [AgrupacionSalaController::class, 'borrarDetalle'])->name('agrupacion-sala.deletePieza');
-    // Route::put('/updatePieza/{id}/{cant}', [AgrupacionSalaController::class, 'actualizarDetalle'])->name('agrupacion-sala.updatePieza');
-    // Route::delete('/{id}', [App\Http\Controllers\AgrupacionSalaController::class, 'destroy'])->name('agrupacion-sala.delete');
-    // Route::get('/print/{id}', [AgrupacionSalaController::class, 'imprimirPreliminar'])->name('agrupacion-sala.print_preliminar');
-    // Route::get('/print-final/{id}', [AgrupacionSalaController::class, 'imprimirFinal'])->name('agrupacion-sala.print_final');
-    // Route::get('/print-historico/{id}', [AgrupacionSalaController::class, 'imprimirHistorico'])->name('agrupacion-sala.print_historico');
-    // Route::get('/print-anulada/{id}', [AgrupacionSalaController::class, 'imprimirAnular'])->name('agrupacion-sala.print_anulada');
+    Route::post('/', [AgrupacionSalaController::class, 'store'])->name('agrupacion-sala.store');
+    Route::get('/datatable', [AgrupacionSalaController::class, 'datatable'])->name('agrupacion-sala.datatable');
+    Route::get('/edit/{id}', [AgrupacionSalaController::class, 'edit'])->name('agrupacion-sala.edit');
+    Route::post('/saveSala', [AgrupacionSalaController::class, 'guardarDetalle'])->name('agrupacion-sala.saveSalas');
+    Route::get('/getDetalle/{id}', [AgrupacionSalaController::class, 'renderDetalle'])->name('agrupacion-sala.getDetalle');
+    Route::delete('/{id}', [App\Http\Controllers\AgrupacionSalaController::class, 'destroy'])->name('agrupacion-sala.delete');
+    Route::get('nota-pieza/meses', [AgrupacionSalaController::class, 'obtenerMeses'])->name('agrupacion-sala.meses');
+    Route::post('/sumar', [AgrupacionSalaController::class, 'sumar'])->name('agrupacion-sala.sumar');
+    Route::post('/restar', [AgrupacionSalaController::class, 'restar'])->name('agrupacion-sala.restar');
+    Route::delete('/eliminar-detalle/{id}', [AgrupacionSalaController::class, 'eliminarDetalle'])->name('agrupacion-sala.eliminarDetalle');
+    Route::get('/resumen/{id}', [AgrupacionSalaController::class, 'renderResumen'])->name('agrupacion-sala.resumen');
+    Route::get('/imprimir-preliminar/{id}', [AgrupacionSalaController::class, 'imprimirPreliminar'])->name('agrupacion-sala.imprimirPreliminar');
+    Route::get('/imprimir-final/{id}', [AgrupacionSalaController::class, 'imprimirFinal'])->name('agrupacion-sala.imprimirFinal');
+    Route::get('/imprimir-historico/{id}', [AgrupacionSalaController::class, 'imprimirHistorico'])->name('agrupacion-sala.imprimirHistorico');
+    Route::get('/imprimir-anulada/{id}', [AgrupacionSalaController::class, 'imprimirAnular'])->name('agrupacion-sala.imprimirAnular');
 });
 
 

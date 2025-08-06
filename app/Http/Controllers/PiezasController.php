@@ -165,4 +165,23 @@ class PiezasController extends Controller
             })->rawColumns(['acciones'])
             ->toJson();
     }
+
+    public function getPiezas(Request $request)
+    {
+        $term = $request->val;
+        $piezas = DB::table('piezas')
+            ->select('id_pieza as id', 'codigo', 'nombre')
+            ->where('codigo', 'like', "%{$term}%")
+            ->orWhere('nombre', 'like', "%{$term}%")
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                ];
+            });
+
+        return response()->json($piezas);
+    }
+
 }

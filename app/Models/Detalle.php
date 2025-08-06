@@ -24,4 +24,11 @@ class Detalle extends Model
         return $this->belongsTo(Pieza::class, 'fk_pieza', 'id_pieza');
     }
 
+    // En Detalle.php (modelo)
+    public function sala()
+    {
+        return $this->belongsTo(Salas::class, 'fk_sala', 'id_salas');
+    }
+
+
 }

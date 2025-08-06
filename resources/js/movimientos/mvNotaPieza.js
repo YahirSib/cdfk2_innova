@@ -612,6 +612,8 @@ $(function() {
                 // Abrir como ventana emergente
                 let popup = window.open(finalUrl, 'popup', 'width=800,height=600,scrollbars=yes,resizable=yes');
 
+                $('#tblPiezas').DataTable().ajax.reload();
+
                 if (!popup || popup.closed || typeof popup.closed === 'undefined') {
                     Swal.fire('Error', 'El navegador bloqueó la ventana emergente.', 'error');
                     return;

@@ -179,24 +179,7 @@ class SalasController extends Controller
             ->toJson();
     }
 
-    public function getPiezas(Request $request)
-    {
-        $term = $request->val;
-        $piezas = DB::table('piezas')
-            ->select('id_pieza as id', 'codigo', 'nombre')
-            ->where('codigo', 'like', "%{$term}%")
-            ->orWhere('nombre', 'like', "%{$term}%")
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'text' => $item->codigo . ' - ' . $item->nombre,
-                ];
-            });
-
-        return response()->json($piezas);
-    }
-
+    
     public function savePiezas(Request $request)
     {
 
@@ -236,20 +219,42 @@ class SalasController extends Controller
         }
     }
 
+    public function obtenerPiezas($id_sala){
+        return DB::table('salas_piezas')
+        ->join('piezas', 'salas_piezas.id_pieza', '=', 'piezas.id_pieza')
+        ->select('salas_piezas.id_relacion', 'piezas.codigo' , 'piezas.nombre', 'salas_piezas.cantidad', 'piezas.id_pieza')
+        ->where('salas_piezas.id_sala', $id_sala)
+        ->get();        
+    }
+
     public function getPiezasBySala(Request $request)
     {
         $id_sala = $request->id_sala;
-        $piezas = DB::table('salas_piezas')
-            ->join('piezas', 'salas_piezas.id_pieza', '=', 'piezas.id_pieza')
-            ->select('salas_piezas.id_relacion', 'piezas.codigo' , 'piezas.nombre', 'salas_piezas.cantidad')
-            ->where('salas_piezas.id_sala', $id_sala)
-            ->get();
+        $piezas = $this->obtenerPiezas($id_sala);
 
         if($piezas->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'No se encontraron piezas para esta sala.']);
         }else{
             return response()->json(['success' => true, 'data' => $piezas]);
         }
+    }
+
+    public function getSalas(Request $request)
+    {
+        $term = $request->val;
+        $salas = DB::table('salas')
+            ->select('id_salas as id', 'codigo', 'nombre')
+            ->where('codigo', 'like', "%{$term}%")
+            ->orWhere('nombre', 'like', "%{$term}%")
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                ];
+            });
+
+        return response()->json($salas);
     }
 
     public function deletePiezaBySala($id)
