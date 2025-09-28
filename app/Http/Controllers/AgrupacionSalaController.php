@@ -510,6 +510,10 @@ class AgrupacionSalaController extends Controller
             $total = $movimiento->totalizar();
             Movimiento::where('id_movimiento', $enca_salida->id_movimiento)->update(['total' => $total]);
 
+            $movimiento_entrada = Movimiento::find($detalle->fk_movimiento);
+            $total_entrada = $movimiento_entrada->totalizar();
+            Movimiento::where('id_movimiento', $movimiento_entrada->id_movimiento)->update(['total' => $total_entrada]);
+
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Detalle eliminado con éxito.', 'total' => $total]);
         } catch (\Exception $e) {

@@ -297,5 +297,32 @@ class SalasController extends Controller
         }
     }
 
+    public function getSalasDisponibles(Request $request)
+    {
+        $term = $request->val;
+        $id_trabajador = $request->id_trabajador;
+
+        $salas = DB::table('salas')
+            ->select('id_salas as id', 'codigo', 'nombre')
+            ->where(function ($query) use ($term) {
+                $query->where('codigo', 'like', "%{$term}%")
+                    ->orWhere('nombre', 'like', "%{$term}%");
+            })
+            ->where('estado', 1)
+            ->get()
+            ->map(function ($item) use ($id_trabajador) {
+                $disponibilidad = (new \App\Services\SalasServices())->disSalasByTrabajador($item->id, $id_trabajador);
+                
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                    'disponibilidad' => $disponibilidad, 
+                ];
+            })
+            ->values();
+
+        return response()->json($salas);
+    }
+
 
 }

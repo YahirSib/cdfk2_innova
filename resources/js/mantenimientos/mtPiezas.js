@@ -14,6 +14,9 @@ $(function() {
         var action = $(this).attr('action');
         var formData = new FormData(this);
         formData.append('_method', method);
+        var individual = $('#individual').is(':checked') ? 1 : 0;
+        formData.append('individual_valor', individual);
+
         //CUANDO EL METODO ES PUT SE ACTUALIZA EL TRABAJADOR
         if(method == 'PUT'){
             Swal.fire({
@@ -277,6 +280,11 @@ $(function() {
                     $('#costo_cacastero').val(response.data.costo_cacastero);
                     $('#existencia').val(response.data.existencia);
                     $('#descripcion').val(response.data.descripcion);
+                    if(response.data.individual == 1){
+                        $('#individual').prop('checked', true);
+                    }else{
+                        $('#individual').prop('checked', false);
+                    }
 
                     //Cambio form para editar
                     $('#frmPiezas').attr('action', $('meta[name="update"]').attr('content'));

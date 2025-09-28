@@ -3,6 +3,46 @@
 @section('title', 'Gestión de Piezas')
 
 @section('content')
+
+<style>
+
+    .switch-container {
+        width: 70px;
+        height: 34px;
+    }
+
+    .switch-slider{
+        height: 100%;
+    }
+
+    .switch-input:checked + .switch-slider {
+        background-color: #4ade80; /* Tailwind green-400 */
+    }
+
+    .switch-slider::before {
+        content: "OFF";
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280; /* Tailwind gray-500 */
+        font-size: 12px;
+        font-weight: bold;
+        position: absolute;
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.4s;
+    }
+
+    .switch-input:checked + .switch-slider::before {
+        transform: translateX(36px);
+        content: "ON";
+        color: #22c55e; /* Tailwind green-500 */
+    }
+</style>
 <!-- Meta tags para las rutas -->
 <meta name="datatable" content="{{ route('piezas.datatable') }}">
 <meta name="edit" content="{{ route('piezas.edit', ['id' => '__ID__']) }}">
@@ -18,18 +58,18 @@
     <!-- Formulario -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
         <form id="frmPiezas" action="{{ route('piezas.store') }}" method="POST">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4 mb-6">
                 <!-- Nombre del empleado-->
-                <div>
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
                     <label for="codigo" class="block mb-2 text-sm font-medium text-gray-900">Codigo<span class="text-red-500">(*)</span></label>
                     <input type="text" id="codigo" name="codigo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Codigo de la pieza">
                 </div>
-                <div>
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
                     <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900">Nombre <span class="text-red-500">(*)</span> </label>
                     <input type="text" id="nombre" name="nombre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Nombre de la pieza">
                 </div>
-                
-                <div>
+
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
                     <label for="estado" class="block mb-2 text-sm font-medium text-gray-900">Estado <span class="text-red-500">(*)</span></label>
                     <select id="estado" name="estado" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         <option value="0"> Seleccione una opción </option>
@@ -38,23 +78,30 @@
                     </select>
                 </div>
 
-                <div>
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1">
                     <label for="existencia" class="block mb-2 text-sm font-medium text-gray-900">Existencia </label>
-                    <input type="text" readonly id="existencia" name="existencia" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Información de existencia">
+                    <input type="text" readonly id="existencia" name="existencia" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="0">
                 </div>
-                
+
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1">
+                    <label for="individual" class="block mb-2 text-sm font-medium text-gray-900">Individual</label>
+                    <label class="relative inline-block switch-container">
+                        <input type="checkbox" id="individual" name="individual" class="switch-input hidden">
+                        <span class="switch-slider block rounded-full bg-gray-500 transition-all duration-300 ease-in-out"></span>
+                    </label>
+                </div>
                 <!-- Tipo -->
-                <div>
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
                     <label for="costo_cacastero" class="block mb-2 text-sm font-medium text-gray-900">Costo Cacastero<span class="text-red-500">(*)</span> </label>
                     <input type="text" id="costo_cacastero" name="costo_cacastero" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el costo por pieza">
                 </div>
                 
                 <!-- Dui -->
-                <div>
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
                     <label for="costo_tapicero" class="block mb-2 text-sm font-medium text-gray-900">Costo Tapicero<span class="text-red-500">(*)</span> </label>
                     <input type="text" id="costo_tapicero" name="costo_tapicero" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el costo por pieza">
                 </div>
-                <div class=" col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4">
                     <label for="descripcion" class="block mb-2 text-sm font-medium text-gray-900">Descipción de la pieza  </label>
                     <textarea type="text" id="descripcion" name="descripcion" class="bg-gray-50 h-auto border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el primer apellido"></textarea>
                 </div>
