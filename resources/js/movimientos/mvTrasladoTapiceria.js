@@ -24,7 +24,6 @@ $(function() {
         $(this).addClass("ring-2 ring-green-500 bg-green-50");
     });
 
-
     function cargarDetallesNotaPieza(id) {
         let baseDeleteUrl = $('meta[name="cargar_pieza"]').attr('content');
         let finalUrl = baseDeleteUrl.replace('__ID__', id);
@@ -33,22 +32,38 @@ $(function() {
             url: finalUrl,
             type: 'GET',
             success: function(response) {
-                const detalles = response.detalles;
-                console.log(detalles);
-                var html = "";
+                const detalles = response.data;
+                var htmlPieza = "";
+                var htmlSala = "";
                 if (detalles.length > 0) {
                     $.each(detalles, function(index, detalle) {
-                        html += `<div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between w-full md:w-[48%] lg:w-[32%]">
+                        if(detalle.fk_pieza == null){
+                            htmlSala += `<div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between w-full md:w-[48%] lg:w-[32%]">
+                                    <div class="flex flex-col w-full">
+                                        <h3 class="text-sm text-gray-500">${detalle.sala.codigo}</h3>
+                                        <h1 class="text-md font-semibold text-gray-800">${detalle.sala.nombre} </h1>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnQuitar" data-id="${detalle.id_detalle}" data-type="sala">-</button>
+                                        <input readonly class="txtCant${detalle.id_detalle} bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center" value="${detalle.unidades}">
+                                        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 btnAgregar" data-id="${detalle.id_detalle}" data-type="sala">+</button>
+                                    </div>
+                                </div>`;
+                        }else{
+                            htmlPieza += `<div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between w-full md:w-[48%] lg:w-[32%]">
                                     <div class="flex flex-col w-full">
                                         <h3 class="text-sm text-gray-500">${detalle.pieza.codigo}</h3>
                                         <h1 class="text-md font-semibold text-gray-800">${detalle.pieza.nombre} </h1>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnQuitar" data-id="${detalle.id_detalle}">-</button>
+                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnQuitar" data-id="${detalle.id_detalle}" data-type="pieza">-</button>
                                         <input readonly class="txtCant${detalle.id_detalle} bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-center" value="${detalle.unidades}">
-                                        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 btnAgregar" data-id="${detalle.id_detalle}">+</button>
+                                        <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 btnAgregar" data-id="${detalle.id_detalle}" data-type="pieza">+</button>
                                     </div>
                                 </div>`;
+                        }
+
+                        
                     });
                 }else{
                     html = `<div class="bg-white p-4 rounded-lg shadow-md w-full text-center">
@@ -56,9 +71,13 @@ $(function() {
                             </div>`;
                 }
 
-                $('#divPiezas').html(html);
+                $('#divPiezas').html(htmlPieza);
+                $('#divSalas').html(htmlSala);
 
-                $('#totalPiezas').text(response.total);
+                console.log(response.total_pieza);
+
+                $('#totalPiezas').text(response.total_pieza);
+                $('#totalSalas').text(response.total_sala);
 
 
             },error: function(xhr, status, error) {
@@ -272,7 +291,8 @@ $(function() {
                 dataType: 'json',
                 data: {
                     val: request.term,
-                    id_trabajador : $('#cacastero').val()
+                    id_trabajador : $('#cacastero').val(),
+                    individual: 1
                 },
                 success: function(data) {
                     response($.map(data, function(item) {
@@ -333,8 +353,8 @@ $(function() {
     $(document).on('submit', '#frmAnexarPieza', function(e) {
         e.preventDefault();
         var id_enca = $('#frmCrear').attr('data-id');
-        var id_pieza = $('#pieza_sala').attr('data-id');
-        var cantidad = $('#cantidad').val();
+        var id_pieza = $('#piezas').attr('data-id');
+        var cantidad = $('#cantidad_piezas').val();
         $.ajax({
             url: $('meta[name="store_pieza"]').attr('content'),
             type: 'POST',
@@ -347,7 +367,58 @@ $(function() {
                 if(response.success) {
                     notyf.success(response.message);
                     $('#frmAnexarPieza')[0].reset();
-                    $('#pieza_sala').removeAttr('data-id');
+                    $('#piezas').removeAttr('data-id');
+                    // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                }else{
+                    notyf.error(response.message);
+                }
+            },error: function(xhr, status, error) {
+                // Manejo de errores
+                var responseText = xhr.responseText;
+                if (xhr.status === 422) {
+                    // Validación fallida
+                    var errors = JSON.parse(responseText);
+                    var errorMessage = '';
+                    $.each(errors.errors, function(key, value) {
+                        errorMessage += value[0] + "<br>";
+                    });
+                    responseText = errorMessage;
+                } else if (xhr.status === 500) {
+                    if(xhr.responseJSON.message){
+                        responseText = xhr.responseJSON.message;
+                    }else{
+                        responseText = 'Error interno de sistema, contacte con soporte tecnico.';
+                    }
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: responseText,
+                    showConfirmButton: true,
+                });
+            }
+        });
+    }
+    );
+
+    $(document).on('submit', '#frmAnexarSala', function(e) {
+        e.preventDefault();
+        var id_enca = $('#frmCrear').attr('data-id');
+        var id_sala = $('#salas').attr('data-id');
+        var cantidad = $('#cantidad_salas').val();
+        $.ajax({
+            url: $('meta[name="store_pieza"]').attr('content'),
+            type: 'POST',
+            data: {
+                id_enca: id_enca,
+                id_salas: id_sala,
+                cantidad: cantidad
+            },
+            success: function(response) {
+                if(response.success) {
+                    notyf.success(response.message);
+                    $('#frmAnexarSala')[0].reset();
+                    $('#salas').removeAttr('data-id');
                     // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
                 }else{
                     notyf.error(response.message);
@@ -382,7 +453,7 @@ $(function() {
     );
 
     if($('[name="action"]').attr('content') == "editar"){
-        // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+        cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
     }
 
     //quitar detalles de la nota de pieza
@@ -391,6 +462,7 @@ $(function() {
         e.preventDefault();
         var id_detalle = $(this).attr('data-id');
         var txtCant = $('.txtCant' + id_detalle).val();
+        var tipo = $(this).attr('data-type');
 
         if(txtCant <= 1) {
             Swal.fire({
@@ -407,10 +479,13 @@ $(function() {
                     $.ajax({
                         url: finalUrl,
                         type: 'DELETE',
+                        data: {
+                            tipo: tipo
+                        },
                         success: function(response) {
                             if(response.success) {
                                 notyf.success(response.message);
-                                // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                                cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
                             }else{
                                 notyf.error(response.message);
                             }
@@ -438,14 +513,18 @@ $(function() {
             let baseDeleteUrl = $('meta[name="update_pieza"]').attr('content');
             let finalUrl = baseDeleteUrl.replace('__ID__', id_detalle);
             finalUrl = finalUrl.replace('__CANT__', parseInt(txtCant) - 1);
+            var tipo = $(this).attr('data-type');
 
             $.ajax({
                 url: finalUrl,
                 type: 'PUT',
+                data: {
+                    tipo: tipo
+                },
                 success: function(response) {
                     if(response.success) {
                         notyf.success(response.message);
-                        // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                        cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
                     }else{
                         notyf.error(response.message);
                     }
@@ -480,14 +559,18 @@ $(function() {
         let baseUpdateUrl = $('meta[name="update_pieza"]').attr('content');
         let finalUrl = baseUpdateUrl.replace('__ID__', id_detalle);
         finalUrl = finalUrl.replace('__CANT__', parseInt(txtCant) + 1);
+        var tipo = $(this).attr('data-type');
 
         $.ajax({
             url: finalUrl,
             type: 'PUT',
+            data: {
+                tipo: tipo
+            },
             success: function(response) {
                 if(response.success) {
                     notyf.success(response.message);
-                    // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                    cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
                 }else{
                     notyf.error(response.message);
                 }

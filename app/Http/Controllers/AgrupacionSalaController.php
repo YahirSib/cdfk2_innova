@@ -115,6 +115,7 @@ class AgrupacionSalaController extends Controller
             return response()->json(['success' => true, 'message' =>  $this->getNombreDoc().' registrada con exito.', 'redirect' => route('agrupacion-sala.edit', ['id' => $AS_entrada->id_movimiento])]);
         } catch (\Exception $e) {
             DB::rollBack();
+            //return response()->json(['success' => false, 'message' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Error al registrar '.$this->getNombreDoc().', contacte con Soporte Técnico.']);
         }  
         

@@ -22,6 +22,7 @@ class CreateInvDetallesTable extends Migration
                   ->references('id_movimiento')
                   ->on('inv_movimiento')
                   ->onDelete('cascade');
+            $table->integer('fk_detalle_prin')->nullable();
         });
     }
 

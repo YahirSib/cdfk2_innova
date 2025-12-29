@@ -136,4 +136,3 @@ Route::middleware(['auth'])->prefix('traslado-tapiceria')->group(function () {
     Route::get('/imprimir-historico/{id}', [TrasladoTapiceriaController::class, 'imprimirHistorico'])->name('traslado-tapiceria.imprimirHistorico');
     Route::get('/imprimir-anulada/{id}', [TrasladoTapiceriaController::class, 'imprimirAnular'])->name('traslado-tapiceria.imprimirAnular');
 });
-

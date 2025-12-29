@@ -7,7 +7,7 @@ import { sync as globSync } from 'glob';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', ...globSync('resources/js/**/*.js') ],
+            input: ['resources/css/app.css', ...globSync('resources/js/**/*.js')],
             refresh: true,
         }),
         inject({
@@ -16,4 +16,11 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    server: {
+        host: '127.0.0.1',
+        cors: true,
+        hmr: {
+            host: '127.0.0.1',
+        },
+    },
 });

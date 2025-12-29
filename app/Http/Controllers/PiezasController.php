@@ -204,8 +204,13 @@ class PiezasController extends Controller
                 $query->where('codigo', 'like', "%{$term}%")
                     ->orWhere('nombre', 'like', "%{$term}%");
             })
-            ->where('estado', 1)
-            ->get()
+            ->where('estado', 1);
+
+        if($request->has('individual')){
+            $piezas->where('individual', $request->individual == 1 ? 1 : 0);
+        }
+
+        $data = $piezas->get()
             ->map(function ($item) use ($id_trabajador) {
                 $disponibilidad = (new \App\Services\PiezasServices())->disPiezaByTrabajador($item->id, $id_trabajador);
                 
@@ -216,9 +221,8 @@ class PiezasController extends Controller
                 ];
             })
             ->values();
-
-        return response()->json($piezas);
+        
+        return response()->json($data);
     }
-
 
 }
