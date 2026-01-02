@@ -39,4 +39,32 @@ class SalasServices
         return $entradas - $salidas; // O manejar el caso donde la pieza no existe
     }
 
+    public function disSalasTraslado($id_sala)
+    {
+
+        // Entradas
+        $entradas = Detalle::query()
+            ->select(DB::raw('IFNULL(SUM(unidades), 0) as total'))
+            ->join('inv_movimiento', 'inv_movimiento.id_movimiento', '=', 'inv_detalles.fk_movimiento')
+            ->where('inv_movimiento.tipo_mov', 'S')
+            ->where('inv_movimiento.tipo_doc', 'TP')
+            ->whereIn('inv_movimiento.estado', ['I', 'A'])
+            ->whereNotNull('inv_detalles.fk_sala')
+            ->where('inv_detalles.fk_sala', $id_sala)
+            ->value('total');
+
+        // Salidas
+        $salidas = Detalle::query()
+            ->select(DB::raw('IFNULL(SUM(unidades), 0) as total'))
+            ->join('inv_movimiento', 'inv_movimiento.id_movimiento', '=', 'inv_detalles.fk_movimiento')
+            ->where('inv_movimiento.tipo_mov', 'E')
+            ->where('inv_movimiento.tipo_doc', 'TT')
+            ->whereIn('inv_movimiento.estado', ['I', 'A'])
+            ->whereNotNull('inv_detalles.fk_sala')
+            ->where('inv_detalles.fk_sala', $id_sala)
+            ->value('total');
+
+        return $entradas - $salidas; // O manejar el caso donde la pieza no existe
+    }
+
 }

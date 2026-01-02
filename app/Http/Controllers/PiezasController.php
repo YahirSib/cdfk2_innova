@@ -225,4 +225,34 @@ class PiezasController extends Controller
         return response()->json($data);
     }
 
+    public function getPiezasDisponiblesTraslado(Request $request){
+        $term = $request->val;
+
+        $piezas = DB::table('piezas')
+            ->select('id_pieza as id', 'codigo', 'nombre')
+            ->where(function ($query) use ($term) {
+                $query->where('codigo', 'like', "%{$term}%")
+                    ->orWhere('nombre', 'like', "%{$term}%");
+            })
+            ->where('estado', 1);
+
+        if($request->has('individual')){
+            $piezas->where('individual', $request->individual == 1 ? 1 : 0);
+        }
+
+        $data = $piezas->get()
+            ->map(function ($item) {
+                $disponibilidad = (new \App\Services\PiezasServices())->disPiezaTraslado($item->id);
+                
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                    'disponibilidad' => $disponibilidad, 
+                ];
+            })
+            ->values();
+        
+        return response()->json($data);
+    }
+
 }

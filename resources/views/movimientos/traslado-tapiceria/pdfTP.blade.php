@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Agrupacion de Sala - {{ $entrada->correlativo }}</title>
+    <title>Traslado a Tapiceria - {{ $entrada->correlativo }}</title>
     <style>
         * {
             box-sizing: border-box;
