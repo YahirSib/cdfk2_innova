@@ -36,6 +36,19 @@ $(function() {
                 var htmlPieza = "";
                 var htmlSala = "";
                 if (detalles.length > 0) {
+
+                    if(response.total_pieza == 0){
+                        htmlPieza = `<div class="bg-white p-4 rounded-lg shadow-md w-full text-center">
+                            <p class="text-gray-500">No hay piezas anexadas a este traslado.</p>
+                        </div>`;
+                    }
+
+                    if(response.total_sala == 0){
+                        htmlSala = `<div class="bg-white p-4 rounded-lg shadow-md w-full text-center">
+                            <p class="text-gray-500">No hay salas anexadas a este traslado.</p>
+                        </div>`;
+                    }
+
                     $.each(detalles, function(index, detalle) {
                         if(detalle.fk_pieza == null){
                             htmlSala += `<div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between w-full md:w-[48%] lg:w-[32%]">
@@ -62,23 +75,22 @@ $(function() {
                                     </div>
                                 </div>`;
                         }
-
-                        
                     });
                 }else{
                     htmlPieza = `<div class="bg-white p-4 rounded-lg shadow-md w-full text-center">
-                                <p class="text-gray-500">No hay detalles anexados a este traslado.</p>
-                            </div>`;
+                            <p class="text-gray-500">No hay piezas anexadas a este traslado.</p>
+                        </div>`;
+                    
+                    htmlSala = `<div class="bg-white p-4 rounded-lg shadow-md w-full text-center">
+                            <p class="text-gray-500">No hay salas anexadas a este traslado.</p>
+                        </div>`;
                 }
 
                 $('#divPiezas').html(htmlPieza);
                 $('#divSalas').html(htmlSala);
 
-                console.log(response.total_pieza);
-
                 $('#totalPiezas').text(response.total_pieza);
                 $('#totalSalas').text(response.total_sala);
-
 
             },error: function(xhr, status, error) {
                 // Manejo de errores

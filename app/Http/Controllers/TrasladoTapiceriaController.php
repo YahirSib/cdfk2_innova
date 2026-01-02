@@ -155,10 +155,12 @@ class TrasladoTapiceriaController extends Controller
         $data['correlativo'] = $trasladoTapiceria->correlativo_formateado;
         $data['fecha_ingreso'] = $trasladoTapiceria->fecha_ingreso_formateada;
         $data['cacastero'] = $trasladoTapiceria->nombre_cacastero;
-        $detalles = $trasladoTapiceria->detalles()->with('pieza')->get();
+        $detalles_pieza = $trasladoTapiceria->detalles()->where('fk_pieza', '!=', null)->with('pieza')->get();
+        $detalles_sala = $trasladoTapiceria->detalles()->where('fk_sala', '!=', null)->with('sala')->get();
         $total = $trasladoTapiceria->totalizar();
         $totalUnidades = $trasladoTapiceria->totalizarUnidades();
-        return $this->renderPDF($trasladoTapiceria, $detalles, $total, $totalUnidades, $data);
+
+        return $this->renderPDF($trasladoTapiceria, $detalles_pieza, $detalles_sala, $total, $totalUnidades, $data);
     }
 
     public function imprimirAnular($id)
@@ -172,7 +174,8 @@ class TrasladoTapiceriaController extends Controller
             $data['correlativo'] = $trasladoTapiceria->correlativo_formateado;
             $data['fecha_ingreso'] = $trasladoTapiceria->fecha_ingreso_formateada;
             $data['cacastero'] = $trasladoTapiceria->nombre_cacastero;
-            $detalles = $trasladoTapiceria->detalles()->with('pieza')->get();
+            $detalles_piezas = $trasladoTapiceria->detalles()->where('fk_pieza', '!=', null)->with('pieza')->get();
+            $detalles_sala = $trasladoTapiceria->detalles()->where('fk_sala', '!=', null)->with('sala')->get();
             $total = $trasladoTapiceria->totalizar();
             $totalUnidades = $trasladoTapiceria->totalizarUnidades();
 
@@ -180,28 +183,37 @@ class TrasladoTapiceriaController extends Controller
             $trasladoTapiceria->fecha_anulacion = now();
             $trasladoTapiceria->save();
 
-            foreach ($detalles as $detalle) {
+            foreach ($detalles_piezas as $detalle) {
                 $id_pieza = $detalle->fk_pieza;
                 $pieza = Pieza::find($id_pieza);
                 $pieza->existencia = $pieza->totalizarExistencias();
+                $pieza->existencia_traslado = $pieza->totalizarExistenciasTraslado();
                 $pieza->save();
             }
 
+            foreach ($detalles_sala as $detalle) {
+                $id_sala = $detalle->fk_sala;
+                $sala = Salas::find($id_sala);
+                $sala->existencia = $sala->totalizarExistencias();
+                $sala->existencia_traslado = $sala->totalizarExistenciasTraslado();
+                $sala->save();
+            }
+
             DB::commit();
-            return $this->renderPDF($trasladoTapiceria, $detalles, $total, $totalUnidades, $data);
+            return $this->renderPDF($trasladoTapiceria, $detalles_piezas, $detalles_sala, $total, $totalUnidades, $data);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Error al generar el PDF, contacte con Soporte Técnico.']);
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
-    public function renderPDF($trasladoTapiceria, $detalles, $total, $totalUnidades, $data)
+    public function renderPDF($entrada, $detalles_pieza, $detalles_sala, $total, $totalUnidades, $data)
     {
         ini_set('memory_limit', '512M');
-        $pdf = Pdf::loadView('movimientos.traslado-tapiceria.pdfTT', compact('trasladoTapiceria', 'detalles', 'total', 'totalUnidades', 'data'));
+        $pdf = Pdf::loadView('movimientos.traslado-tapiceria.pdfTT', compact('entrada', 'detalles_pieza', 'detalles_sala', 'total', 'totalUnidades', 'data'));
         $pdf->setPaper('A4', 'portrait');
 
-        return $pdf->stream('traslado_tapiceria' . $trasladoTapiceria->correlativo . '.pdf');
+        return $pdf->stream('traslado_tapiceria' . $entrada->correlativo . '.pdf');
     }
 
     public function create()
@@ -389,9 +401,44 @@ class TrasladoTapiceriaController extends Controller
 
     public function actualizarDetalle($id = null, $cant = null, Request $request){
         try{
+            $detalle = Detalle::find($id);
+            $id_enca = $detalle->fk_movimiento;
+
+            if($cant <= 0){
+                return response()->json(['success' => false, 'message' => 'La cantidad debe ser mayor a cero.']);
+            }
+
+            $enca = Movimiento::find($id_enca);
+            $cacastero = $enca->cacastero;
+
+            if($detalle->fk_pieza){
+                $id_pieza = $detalle->fk_pieza;
+                $piezaService = new PiezasServices();
+                $valor = $piezaService->disPiezaByTrabajador($id_pieza, $cacastero) + $detalle->unidades;
+                if($cant > $valor){
+                    return response()->json(['success' => false, 'message' => 'La cantidad solicitada supera la disponibilidad de la pieza seleccionada.']);
+                }
+            }
+
+            if($detalle->fk_sala){
+                $id_salas = $detalle->fk_sala;
+                $salasService = new SalasServices();
+                $valor = $salasService->disSalasbyTrabajador($id_salas, $cacastero) + $detalle->unidades;
+                if($cant > $valor){
+                    return response()->json(['success' => false, 'message' => 'La cantidad solicitada supera la disponibilidad de la sala seleccionada.']);
+                }
+            }
+
+            $cantidad = $cant;
+            $detalle->unidades = $cantidad;
+            $detalle->save();
+
+            $movimiento = Movimiento::find($id_enca);
+            $total = $movimiento->totalizar();
+            Movimiento::where('id_movimiento', $id_enca)->update(['total' => $total]);
             return response()->json(['success' => true, 'message' => 'Detalle actualizado con éxito.']);
         }catch(\Exception $e){
-            return response()->json(['success' => false, 'message' => 'Error al actualizar el detalle, contacte con Soporte Técnico.']);
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
@@ -412,6 +459,58 @@ class TrasladoTapiceriaController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Error al eliminar el detalle, contacte con Soporte Técnico.']);
         }
+    }
+
+    public function imprimirPreliminar($id){
+        $data = [];
+        $data['title'] = strtoupper( $this->nombre_doc . ' PRELIMINAR');
+        $entrada = Movimiento::find($id);
+        $data['entrada'] = $entrada;
+        $data['correlativo'] = $entrada->correlativo_formateado;
+        $data['fecha_ingreso'] = $entrada->fecha_ingreso_formateada;
+        $data['cacastero'] = $entrada->nombre_cacastero;
+        $detalles_pieza = $entrada->detalles()->where('fk_pieza', '!=', null)->with('pieza')->get();
+        $detalles_sala = $entrada->detalles()->where('fk_sala', '!=', null)->with('sala')->get();
+        $total = $entrada->totalizar();
+        $totalUnidades = $entrada->totalizarUnidades();
+
+        return $this->renderPDF($entrada, $detalles_pieza, $detalles_sala, $total, $totalUnidades, $data);
+    }
+
+     public function imprimirFinal($id){
+        $data = [];
+        $data['title'] = strtoupper( $this->nombre_doc);
+        $entrada = Movimiento::find($id);
+        $data['entrada'] = $entrada;
+        $data['correlativo'] = $entrada->correlativo_formateado;
+        $data['fecha_ingreso'] = $entrada->fecha_ingreso_formateada;
+        $data['cacastero'] = $entrada->nombre_cacastero;
+        $detalles_pieza = $entrada->detalles()->where('fk_pieza', '!=', null)->with('pieza')->get();
+        $detalles_sala = $entrada->detalles()->where('fk_sala', '!=', null)->with('sala')->get();
+        $total = $entrada->totalizar();
+        $totalUnidades = $entrada->totalizarUnidades();
+
+        $entrada->estado = 'I'; // Cambiar el estado a Inactivo
+        $entrada->fecha_impresion = now(); 
+        $entrada->save();
+
+        foreach ($detalles_pieza as $detalle) {
+            $id_pieza = $detalle->fk_pieza;
+            $pieza = Pieza::find($id_pieza);
+            $pieza->existencia = $pieza->totalizarExistencias();
+            $pieza->existencia_traslado = $pieza->totalizarExistenciasTraslado();
+            $pieza->save();
+        }
+
+        foreach ($detalles_sala as $detalle) {
+            $id_sala = $detalle->fk_sala;
+            $sala = Salas::find($id_sala);
+            $sala->existencia = $sala->totalizarExistencias();
+            $sala->existencia_traslado = $sala->totalizarExistenciasTraslado();
+            $sala->save();
+        }
+
+        return $this->renderPDF($entrada, $detalles_pieza, $detalles_sala, $total, $totalUnidades, $data);
     }
 
 }

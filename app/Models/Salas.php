@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 class Salas extends Model
 {
@@ -36,6 +37,44 @@ class Salas extends Model
             ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
             ->where('d.fk_sala', $this->id_salas)
             ->where('m.estado', 'I')
+            ->selectRaw("
+                SUM(CASE 
+                    WHEN m.tipo_mov = 'E' THEN d.unidades
+                    WHEN m.tipo_mov = 'S' THEN -d.unidades
+                    ELSE 0
+                END) as total")
+            ->value('total') ?? 0;
+
+        return $total;
+
+    }
+
+    public function totalizarExistenciasTraslado()
+    {
+        $total = \DB::table('inv_detalles as d')
+            ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
+            ->where('d.fk_sala', $this->id_salas)
+            ->where('m.estado', 'I')
+            ->whereIn('m.tipo_doc', ['TP', 'TS'])
+            ->selectRaw("
+                SUM(CASE 
+                    WHEN m.tipo_mov = 'E' THEN -d.unidades
+                    WHEN m.tipo_mov = 'S' THEN d.unidades
+                    ELSE 0
+                END) as total")
+            ->value('total') ?? 0;
+
+        return $total;
+
+    }
+
+    public function totalizarExistenciasTapizado()
+    {
+        $total = \DB::table('inv_detalles as d')
+            ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
+            ->where('d.fk_sala', $this->id_salas)
+            ->where('m.estado', 'I')
+            ->whereIn('m.tipo_doc', ['TS', 'V1'])
             ->selectRaw("
                 SUM(CASE 
                     WHEN m.tipo_mov = 'E' THEN d.unidades

@@ -16,6 +16,7 @@ class CreatePiezasTable extends Migration
             $table->decimal('costo_cacastero', 19, 3);
             $table->decimal('costo_tapicero', 19, 3);
             $table->integer('existencia')->default(0);
+            $table->integer('exitencia_traslado')->default(0);
             $table->integer('exitencia_tapizado')->default(0);
             $table->string('estado');
             $table->integer('individual')->default(0);

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Traslado a Tapiceria - {{ $trasladoTapiceria->correlativo }}</title>
+    <title>Agrupacion de Sala - {{ $entrada->correlativo }}</title>
     <style>
         * {
             box-sizing: border-box;
@@ -69,6 +69,7 @@
         table.table-detalle {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
 
         table.table-detalle th,
@@ -131,6 +132,45 @@
 
         <table class="table-detalle">
             <thead>
+                <tr colspan="6">
+                    <th colspan="6">Traslado de Salas</th>
+                </tr>
+                <tr>
+                    <th>#</th>
+                    <th>Cod. Sala</th>
+                    <th>Nombre de Sala</th>
+                    <th>Cantidad</th>
+                    <th>Costo Unitario</th>
+                    <th>Costo Total</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if ($detalles_sala->count() > 0)
+                    @foreach($detalles_sala as $index => $detalle)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $detalle->sala->codigo }}</td>
+                            <td>{{ $detalle->sala->nombre }}</td>
+                            <td class="right">{{ $detalle->unidades }}</td>
+                            <td class="right">${{ number_format($detalle->costo_unitario, 2) }}</td>
+                            <td class="right">${{ number_format($detalle->costo_total, 2) }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No hay salas trasladadas.</td>
+                    </tr>
+                @endif
+               
+            </tbody>
+        </table>
+
+        <table class="table-detalle">
+            <thead>
+                <tr colspan="6">
+                    <th colspan="6" class="center">Traslado de Piezas</th>
+                </tr>
                 <tr>
                     <th>#</th>
                     <th>Cod. Pieza</th>
@@ -141,9 +181,10 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($detalles as $index => $detalle)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
+                @if ($detalles_pieza->count() > 0)
+                    @foreach($detalles_pieza as $index => $detalle)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
                         <td>{{ $detalle->pieza->codigo }}</td>
                         <td>{{ $detalle->pieza->nombre }}</td>
                         <td class="right">{{ $detalle->unidades }}</td>
@@ -151,23 +192,23 @@
                         <td class="right">${{ number_format($detalle->costo_total, 2) }}</td>
                     </tr>
                 @endforeach
-               
+                @else
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No hay piezas trasladadas.</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
 
         <table class="totals">
             <tr>
-                <td class="right bold">Total de Unidades:</td>
-                <td class="right">${{ number_format($totalUnidades, 2) }}</td>
-            </tr>
-            <tr>
-                <td class="right bold">Total Documento:</td>
-                <td class="right">${{number_format($total, 2)}}</td>
+                <td class="right bold">Total Costo:</td>
+                <td class="right">${{ number_format($total, 2) }}</td>
             </tr>
         </table>
 
         <div class="comment">
-            <strong>Comentario:</strong> {{ $trasladoTapiceria->comentario ?? 'N/A' }}
+            <strong>Comentario:</strong> {{ $entrada->comentario ?? 'N/A' }}
         </div>
 
         <div class="footer">
