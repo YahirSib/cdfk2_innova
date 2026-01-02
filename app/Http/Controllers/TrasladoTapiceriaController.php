@@ -389,27 +389,28 @@ class TrasladoTapiceriaController extends Controller
 
     public function actualizarDetalle($id = null, $cant = null, Request $request){
         try{
-            // $cant = (int) $cant; // Asegurarse de que la cantidad sea un entero
-            // $detalle = Detalle::find($id);
-            // if (!$detalle) {
-            //     return response()->json(['success' => false, 'message' => 'Detalle no encontrado.']);
-            // }
-
-            // $cantidad = $cant;
-            // $precioUnitario = $detalle->costo_unitario;
-            // $precioTotal = round($cantidad * $precioUnitario, 2);
-
-            // $detalle->unidades = $cantidad;
-            // $detalle->costo_total = $precioTotal;
-            // $detalle->save();
-
-            // $movimiento = Movimiento::find($detalle->fk_movimiento);
-            // $total = $movimiento->totalizar();
-            // Movimiento::where('id_movimiento', $detalle->fk_movimiento)->update(['total' => $total]);
-
             return response()->json(['success' => true, 'message' => 'Detalle actualizado con éxito.']);
         }catch(\Exception $e){
             return response()->json(['success' => false, 'message' => 'Error al actualizar el detalle, contacte con Soporte Técnico.']);
+        }
+    }
+
+    public function borrarDetalle($id = null){
+        try{
+            DB::beginTransaction();
+            $detalle = Detalle::find($id);
+            $fk_movimiento = $detalle->fk_movimiento;
+            $detalle->delete();
+
+            $movimiento = Movimiento::find($fk_movimiento);
+            $total = $movimiento->totalizar();
+            Movimiento::where('id_movimiento', $fk_movimiento)->update(['total' => $total]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Detalle eliminado con éxito.']);
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el detalle, contacte con Soporte Técnico.']);
         }
     }
 

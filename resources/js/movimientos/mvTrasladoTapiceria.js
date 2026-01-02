@@ -66,7 +66,7 @@ $(function() {
                         
                     });
                 }else{
-                    html = `<div class="bg-white p-4 rounded-lg shadow-md w-full text-center">
+                    htmlPieza = `<div class="bg-white p-4 rounded-lg shadow-md w-full text-center">
                                 <p class="text-gray-500">No hay detalles anexados a este traslado.</p>
                             </div>`;
                 }
@@ -368,7 +368,7 @@ $(function() {
                     notyf.success(response.message);
                     $('#frmAnexarPieza')[0].reset();
                     $('#piezas').removeAttr('data-id');
-                    // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                    cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
                 }else{
                     notyf.error(response.message);
                 }
@@ -419,7 +419,7 @@ $(function() {
                     notyf.success(response.message);
                     $('#frmAnexarSala')[0].reset();
                     $('#salas').removeAttr('data-id');
-                    // cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
+                    cargarDetallesNotaPieza($('#frmCrear').attr('data-id'));
                 }else{
                     notyf.error(response.message);
                 }
