@@ -14,6 +14,7 @@ use App\Http\Controllers\AgrupacionSalaController;
 use App\Http\Controllers\TrasladoTapiceriaController;
 use App\Http\Controllers\TapizadoTerminadoController;
 use App\Http\Controllers\ReporteDisponibilidad;
+use App\Http\Controllers\VentaSalaController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
@@ -65,6 +66,7 @@ Route::middleware(['auth'])->prefix('piezas')->group(function () {
     Route::post('/getPiezas', [PiezasController::class, 'getPiezas'])->name('piezas.getPiezas');
     Route::post('/getPiezasDisponibles', [PiezasController::class, 'getPiezasDisponibles'])->name('piezas.getPiezasDisponibles');
     Route::post('/getPiezasTrasladoDisponibles', [PiezasController::class, 'getPiezasDisponiblesTraslado'])->name('piezas.getPiezasTrasladoDisponibles');
+    Route::post('/getPiezasDisponiblesTapizado', [PiezasController::class, 'getPiezasDisponiblesTapizado'])->name('piezas.getPiezasDisponiblesTapizado');
 });
 
 Route::middleware(['auth'])->prefix('salas')->group(function () {
@@ -81,6 +83,8 @@ Route::middleware(['auth'])->prefix('salas')->group(function () {
     Route::post('/getSalas', [SalasController::class, 'getSalas'])->name('salas.getSalas');
     Route::post('/getSalasDisponibles', [SalasController::class, 'getSalasDisponibles'])->name('salas.getSalasDisponibles');
     Route::post('/getSalasDisponiblesTraslado', [SalasController::class, 'getSalasDisponiblesTraslado'])->name('salas.getSalasDisponiblesTraslado');
+    Route::post('/getSalasDisponiblesTapizado', [SalasController::class, 'getSalasDisponiblesTapizado'])->name('salas.getSalasDisponiblesTapizado');
+     
 });
 
 Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
@@ -158,6 +162,24 @@ Route::middleware(['auth'])->prefix('tapizado-terminado')->group(function () {
     Route::get('/imprimir-final/{id}', [TapizadoTerminadoController::class, 'imprimirFinal'])->name('tapizado-terminado.imprimirFinal');
     Route::get('/imprimir-historico/{id}', [TapizadoTerminadoController::class, 'imprimirHistorico'])->name('tapizado-terminado.imprimirHistorico');
     Route::get('/imprimir-anulada/{id}', [TapizadoTerminadoController::class, 'imprimirAnular'])->name('tapizado-terminado.imprimirAnular');
+});
+
+Route::middleware(['auth'])->prefix('venta-sala')->group(function () {
+    Route::get('/', [VentaSalaController::class, 'index'])->name('venta-sala.index');
+    Route::get('/create', [VentaSalaController::class, 'create'])->name('venta-sala.create');
+    Route::post('/', [VentaSalaController::class, 'store'])->name('venta-sala.store');
+    Route::get('/datatable', [VentaSalaController::class, 'datatable'])->name('venta-sala.datatable');
+    Route::get('/edit/{id}', [VentaSalaController::class, 'edit'])->name('venta-sala.edit');
+    Route::post('/update', [VentaSalaController::class, 'update'])->name('venta-sala.update');
+    Route::delete('/{id}', [VentaSalaController::class, 'destroy'])->name('venta-sala.delete');
+    Route::post('/saveDetalle', [VentaSalaController::class, 'guardarDetalle'])->name('venta-sala.saveDetalle');
+    Route::get('/getDetalle/{id}', [VentaSalaController::class, 'cargarDetalles'])->name('venta-sala.getDetalle');
+    Route::delete('/deleteDetalle/{id}', [VentaSalaController::class, 'borrarDetalle'])->name('venta-sala.deleteDetalle');
+    Route::put('/updateDetalle/{id}/{cant}', [VentaSalaController::class, 'actualizarDetalle'])->name('venta-sala.updateDetalle');
+    Route::get('/imprimir-preliminar/{id}', [VentaSalaController::class, 'imprimirPreliminar'])->name('venta-sala.imprimirPreliminar');
+    Route::get('/imprimir-final/{id}', [VentaSalaController::class, 'imprimirFinal'])->name('venta-sala.imprimirFinal');
+    Route::get('/imprimir-historico/{id}', [VentaSalaController::class, 'imprimirHistorico'])->name('venta-sala.imprimirHistorico');
+    Route::get('/imprimir-anulada/{id}', [VentaSalaController::class, 'imprimirAnular'])->name('venta-sala.imprimirAnular');
 });
 
 Route::middleware(['auth'])->prefix('reporte-disponibilidad')->group(function () {

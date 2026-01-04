@@ -37,7 +37,7 @@ class Salas extends Model
             ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
             ->where('d.fk_sala', $this->id_salas)
             ->where('m.estado', 'I')
-            ->whereNotIn('m.tipo_doc', ['TT', 'V1'])
+            ->whereNotIn('m.tipo_doc', ['TT', 'VS'])
             ->selectRaw("
                 SUM(CASE 
                     WHEN m.tipo_mov = 'E' THEN d.unidades
@@ -75,7 +75,7 @@ class Salas extends Model
             ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
             ->where('d.fk_sala', $this->id_salas)
             ->where('m.estado', 'I')
-            ->whereIn('m.tipo_doc', ['TT', 'V1'])
+            ->whereIn('m.tipo_doc', ['TT', 'VS'])
             ->selectRaw("
                 SUM(CASE 
                     WHEN m.tipo_mov = 'E' THEN d.unidades

@@ -349,5 +349,29 @@ class SalasController extends Controller
         return response()->json($salas);
     }
 
+    public function getSalasDisponiblesTapizado(Request $request)
+    {
+        $term = $request->val;
+        $salas = DB::table('salas')
+            ->select('id_salas as id', 'codigo', 'nombre')
+            ->where(function ($query) use ($term) {
+                $query->where('codigo', 'like', "%{$term}%")
+                    ->orWhere('nombre', 'like', "%{$term}%");
+            })
+            ->where('estado', 1)
+            ->get()
+            ->map(function ($item) {
+                $disponibilidad = (new \App\Services\SalasServices())->disSalasTapizado($item->id);
+                
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                    'disponibilidad' => $disponibilidad, 
+                ];
+            })
+            ->values();
+
+        return response()->json($salas);
+    }
 
 }

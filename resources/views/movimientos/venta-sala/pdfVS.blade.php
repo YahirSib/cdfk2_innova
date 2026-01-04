@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Traslado a Tapiceria - {{ $entrada->correlativo }}</title>
+    <title>Venta de Salas - {{ $entrada->correlativo }}</title>
     <style>
         * {
             box-sizing: border-box;
@@ -125,7 +125,7 @@
 
         <table class="info-table">
             <tr>
-                <td><strong>Carpintero:</strong> {{$data['cacastero']}}</td>
+                <td><strong>Cliente:</strong> {{$data['cliente']}}</td>
                 <td style="text-align: right;"><strong>Fecha Documento:</strong> {{$data['fecha_ingreso']}}</td>
             </tr>
         </table>
@@ -133,7 +133,7 @@
         <table class="table-detalle">
             <thead>
                 <tr colspan="6">
-                    <th colspan="6">Tapizado de Salas</th>
+                    <th colspan="6">Venta de Salas</th>
                 </tr>
                 <tr>
                     <th>#</th>
@@ -169,7 +169,7 @@
         <table class="table-detalle">
             <thead>
                 <tr colspan="6">
-                    <th colspan="6" class="center">Tapizado de Piezas</th>
+                    <th colspan="6" class="center">Venta de Piezas</th>
                 </tr>
                 <tr>
                     <th>#</th>
