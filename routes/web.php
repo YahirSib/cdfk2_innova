@@ -13,6 +13,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AgrupacionSalaController;
 use App\Http\Controllers\TrasladoTapiceriaController;
 use App\Http\Controllers\TapizadoTerminadoController;
+use App\Http\Controllers\ReporteDisponibilidad;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
@@ -157,4 +158,10 @@ Route::middleware(['auth'])->prefix('tapizado-terminado')->group(function () {
     Route::get('/imprimir-final/{id}', [TapizadoTerminadoController::class, 'imprimirFinal'])->name('tapizado-terminado.imprimirFinal');
     Route::get('/imprimir-historico/{id}', [TapizadoTerminadoController::class, 'imprimirHistorico'])->name('tapizado-terminado.imprimirHistorico');
     Route::get('/imprimir-anulada/{id}', [TapizadoTerminadoController::class, 'imprimirAnular'])->name('tapizado-terminado.imprimirAnular');
+});
+
+Route::middleware(['auth'])->prefix('reporte-disponibilidad')->group(function () {
+    Route::get('/', [ReporteDisponibilidad::class, 'index'])->name('reporte-disponibilidad.index');
+    Route::post('/generar-reporte', [ReporteDisponibilidad::class, 'generarReporte'])
+    ->name('reporte-disponibilidad.pdf');
 });

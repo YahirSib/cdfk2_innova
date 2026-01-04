@@ -73,6 +73,24 @@ class PermisosMenuSeeder extends Seeder
                 'id_perfil' => 1,
                 'estado' => 1
             ],
+            [
+                'id_permiso' => 11,
+                'id_menu' => 12,
+                'id_perfil' => 1,
+                'estado' => 1
+            ],
+            [
+                'id_permiso' => 12,
+                'id_menu' => 13,
+                'id_perfil' => 1,
+                'estado' => 1
+            ],
+            [
+                'id_permiso' => 13,
+                'id_menu' => 7,
+                'id_perfil' => 1,
+                'estado' => 1
+            ],
         ]);
     }
 }
