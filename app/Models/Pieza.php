@@ -16,7 +16,8 @@ class Pieza extends Model
         'codigo',
         'estado',
         'costo_cacastero',
-        'costo_tapicero'
+        'costo_tapicero',
+        'individual'
     ];
 
     protected $casts = [
@@ -27,6 +28,7 @@ class Pieza extends Model
         'estado' => 'int',
         'costo_cacastero' => 'double',
         'costo_tapicero' => 'double',
+        'individual' => 'int'
     ];
 
     public function totalizarExistencias()
@@ -35,6 +37,45 @@ class Pieza extends Model
             ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
             ->where('d.fk_pieza', $this->id_pieza)
             ->where('m.estado', 'I')
+            ->whereNotIn('m.tipo_doc', ['TT', 'V1'])
+            ->selectRaw("
+                SUM(CASE 
+                    WHEN m.tipo_mov = 'E' THEN d.unidades
+                    WHEN m.tipo_mov = 'S' THEN -d.unidades
+                    ELSE 0
+                END) as total")
+            ->value('total') ?? 0;
+
+        return $total;
+
+    }
+
+    public function totalizarExistenciasTraslado()
+    {
+        $total = \DB::table('inv_detalles as d')
+            ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
+            ->where('d.fk_pieza', $this->id_pieza)
+            ->where('m.estado', 'I')
+            ->whereIn('m.tipo_doc', ['TP', 'TT'])
+            ->selectRaw("
+                SUM(CASE 
+                    WHEN m.tipo_mov = 'S' THEN d.unidades
+                    WHEN m.tipo_mov = 'E' THEN -d.unidades
+                    ELSE 0
+                END) as total")
+            ->value('total') ?? 0;
+
+        return $total;
+
+    }
+
+    public function totalizarExistenciasTapizado()
+    {
+        $total = \DB::table('inv_detalles as d')
+            ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
+            ->where('d.fk_pieza', $this->id_pieza)
+            ->where('m.estado', 'I')
+            ->whereIn('m.tipo_doc', ['TT', 'V1'])
             ->selectRaw("
                 SUM(CASE 
                     WHEN m.tipo_mov = 'E' THEN d.unidades

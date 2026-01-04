@@ -16,6 +16,8 @@ class CreateSalasTable extends Migration
             $table->double('costo_cacastero');
             $table->double('costo_tapicero');
             $table->integer('existencia')->default(0);
+            $table->integer('existencia_traslado')->default(0);
+            $table->integer('existencia_tapizado')->default(0);
             $table->integer('estado');
             $table->timestamps(); // si deseas registrar created_at y updated_at
         });

@@ -115,6 +115,7 @@ class AgrupacionSalaController extends Controller
             return response()->json(['success' => true, 'message' =>  $this->getNombreDoc().' registrada con exito.', 'redirect' => route('agrupacion-sala.edit', ['id' => $AS_entrada->id_movimiento])]);
         } catch (\Exception $e) {
             DB::rollBack();
+            //return response()->json(['success' => false, 'message' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Error al registrar '.$this->getNombreDoc().', contacte con Soporte Técnico.']);
         }  
         
@@ -509,6 +510,10 @@ class AgrupacionSalaController extends Controller
             $movimiento = Movimiento::find($enca_salida->id_movimiento);
             $total = $movimiento->totalizar();
             Movimiento::where('id_movimiento', $enca_salida->id_movimiento)->update(['total' => $total]);
+
+            $movimiento_entrada = Movimiento::find($detalle->fk_movimiento);
+            $total_entrada = $movimiento_entrada->totalizar();
+            Movimiento::where('id_movimiento', $movimiento_entrada->id_movimiento)->update(['total' => $total_entrada]);
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Detalle eliminado con éxito.', 'total' => $total]);

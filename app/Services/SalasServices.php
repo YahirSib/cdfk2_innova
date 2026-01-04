@@ -8,10 +8,10 @@ use App\Models\Piezas;
 use App\Models\Salas;
 use Illuminate\Support\Facades\DB;
 
-class PiezasServices
+class SalasServices
 {
 
-    public function disPiezaByTrabajador($id_pieza, $id_trabajador)
+    public function disSalasByTrabajador($id_sala, $id_trabajador)
     {
 
         // Entradas
@@ -21,8 +21,8 @@ class PiezasServices
             ->where('inv_movimiento.tipo_mov', 'E')
             ->whereIn('inv_movimiento.estado', ['I', 'A'])
             ->where('inv_movimiento.cacastero', $id_trabajador)
-            ->whereNotNull('inv_detalles.fk_pieza')
-            ->where('inv_detalles.fk_pieza', $id_pieza)
+            ->whereNotNull('inv_detalles.fk_sala')
+            ->where('inv_detalles.fk_sala', $id_sala)
             ->value('total');
 
         // Salidas
@@ -32,14 +32,14 @@ class PiezasServices
             ->where('inv_movimiento.tipo_mov', 'S')
             ->whereIn('inv_movimiento.estado', ['I', 'A'])
             ->where('inv_movimiento.cacastero', $id_trabajador)
-            ->whereNotNull('inv_detalles.fk_pieza')
-            ->where('inv_detalles.fk_pieza', $id_pieza)
+            ->whereNotNull('inv_detalles.fk_sala')
+            ->where('inv_detalles.fk_sala', $id_sala)
             ->value('total');
 
         return $entradas - $salidas; // O manejar el caso donde la pieza no existe
     }
 
-    public function disPiezaTraslado($id_pieza)
+    public function disSalasTraslado($id_sala)
     {
 
         // Entradas
@@ -49,8 +49,8 @@ class PiezasServices
             ->where('inv_movimiento.tipo_mov', 'S')
             ->where('inv_movimiento.tipo_doc', 'TP')
             ->whereIn('inv_movimiento.estado', ['I', 'A'])
-            ->whereNotNull('inv_detalles.fk_pieza')
-            ->where('inv_detalles.fk_pieza', $id_pieza)
+            ->whereNotNull('inv_detalles.fk_sala')
+            ->where('inv_detalles.fk_sala', $id_sala)
             ->value('total');
 
         // Salidas
@@ -60,8 +60,8 @@ class PiezasServices
             ->where('inv_movimiento.tipo_mov', 'E')
             ->where('inv_movimiento.tipo_doc', 'TT')
             ->whereIn('inv_movimiento.estado', ['I', 'A'])
-            ->whereNotNull('inv_detalles.fk_pieza')
-            ->where('inv_detalles.fk_pieza', $id_pieza)
+            ->whereNotNull('inv_detalles.fk_sala')
+            ->where('inv_detalles.fk_sala', $id_sala)
             ->value('total');
 
         return $entradas - $salidas; // O manejar el caso donde la pieza no existe

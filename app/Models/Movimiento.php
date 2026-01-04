@@ -46,6 +46,13 @@ class Movimiento extends Model
         return $t ? "{$t->nombre1} {$t->nombre2} {$t->apellido1} {$t->apellido2}" : null;
     }
 
+    public function getNombreTapiceroAttribute()
+    {
+        $t = DB::table('trabajadores')->where('id_trabajador', $this->tapicero)->first();
+
+        return $t ? "{$t->nombre1} {$t->nombre2} {$t->apellido1} {$t->apellido2}" : null;
+    }
+
     public function getCorrelativoFormateadoAttribute()
     {
         return $this->tipo_doc . '-' . str_pad($this->correlativo, 5, '0', STR_PAD_LEFT);

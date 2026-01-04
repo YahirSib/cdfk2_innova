@@ -11,6 +11,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RenderAppController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AgrupacionSalaController;
+use App\Http\Controllers\TrasladoTapiceriaController;
+use App\Http\Controllers\TapizadoTerminadoController;
+use App\Http\Controllers\ReporteDisponibilidad;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
@@ -38,7 +41,7 @@ Route::middleware(['auth'])->prefix('usuarios')->group(function () {
     Route::get('/edit/{id}', [UserController::class, 'edit'])->name('usuarios.edit');
     Route::post('/', [UserController::class, 'store'])->name('usuarios.store');
     Route::get('/datatable', [UserController::class, 'datatable'])->name('usuarios.datatable');
-    Route::delete('/{sala-anexarid}', [UserController::class, 'destroy'])->name('usuarios.delete');
+    Route::delete('/', [UserController::class, 'destroy'])->name('usuarios.delete');
     Route::put('/', [UserController::class, 'update'])->name('usuarios.update');
     Route::post('/reset', [UserController::class, 'reset_pass'])->name('usuarios.reset');
 });
@@ -60,6 +63,8 @@ Route::middleware(['auth'])->prefix('piezas')->group(function () {
     Route::delete('/{id}', [PiezasController::class, 'destroy'])->name('piezas.delete');
     Route::put('/', [PiezasController::class, 'update'])->name('piezas.update');
     Route::post('/getPiezas', [PiezasController::class, 'getPiezas'])->name('piezas.getPiezas');
+    Route::post('/getPiezasDisponibles', [PiezasController::class, 'getPiezasDisponibles'])->name('piezas.getPiezasDisponibles');
+    Route::post('/getPiezasTrasladoDisponibles', [PiezasController::class, 'getPiezasDisponiblesTraslado'])->name('piezas.getPiezasTrasladoDisponibles');
 });
 
 Route::middleware(['auth'])->prefix('salas')->group(function () {
@@ -74,6 +79,8 @@ Route::middleware(['auth'])->prefix('salas')->group(function () {
     Route::delete('/deletePiezaBySala/{id}', [SalasController::class, 'deletePiezaBySala'])->name('salas.deletePiezaBySala');
     Route::put('/updatePiezaBySala', [SalasController::class, 'updatePiezaBySala'])->name('salas.updatePiezaBySala');
     Route::post('/getSalas', [SalasController::class, 'getSalas'])->name('salas.getSalas');
+    Route::post('/getSalasDisponibles', [SalasController::class, 'getSalasDisponibles'])->name('salas.getSalasDisponibles');
+    Route::post('/getSalasDisponiblesTraslado', [SalasController::class, 'getSalasDisponiblesTraslado'])->name('salas.getSalasDisponiblesTraslado');
 });
 
 Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
@@ -116,5 +123,45 @@ Route::middleware(['auth'])->prefix('agrupacion-sala')->group(function () {
     Route::get('/imprimir-anulada/{id}', [AgrupacionSalaController::class, 'imprimirAnular'])->name('agrupacion-sala.imprimirAnular');
 });
 
+Route::middleware(['auth'])->prefix('traslado-tapiceria')->group(function () {
+    Route::get('/', [TrasladoTapiceriaController::class, 'index'])->name('traslado-tapiceria.index');
+    Route::get('/create', [TrasladoTapiceriaController::class, 'create'])->name('traslado-tapiceria.create');
+    Route::post('/', [TrasladoTapiceriaController::class, 'store'])->name('traslado-tapiceria.store');
+    Route::get('/datatable', [TrasladoTapiceriaController::class, 'datatable'])->name('traslado-tapiceria.datatable');
+    Route::get('/edit/{id}', [TrasladoTapiceriaController::class, 'edit'])->name('traslado-tapiceria.edit');
+    Route::post('/update', [TrasladoTapiceriaController::class, 'update'])->name('traslado-tapiceria.update');
+    Route::delete('/{id}', [TrasladoTapiceriaController::class, 'destroy'])->name('traslado-tapiceria.delete');
+    Route::post('/saveDetalle', [TrasladoTapiceriaController::class, 'guardarDetalle'])->name('traslado-tapiceria.saveDetalle');
+    Route::get('/getDetalle/{id}', [TrasladoTapiceriaController::class, 'cargarDetalles'])->name('traslado-tapiceria.getDetalle');
+    Route::delete('/deleteDetalle/{id}', [TrasladoTapiceriaController::class, 'borrarDetalle'])->name('traslado-tapiceria.deleteDetalle');
+    Route::put('/updateDetalle/{id}/{cant}', [TrasladoTapiceriaController::class, 'actualizarDetalle'])->name('traslado-tapiceria.updateDetalle');
+    Route::get('/imprimir-preliminar/{id}', [TrasladoTapiceriaController::class, 'imprimirPreliminar'])->name('traslado-tapiceria.imprimirPreliminar');
+    Route::get('/imprimir-final/{id}', [TrasladoTapiceriaController::class, 'imprimirFinal'])->name('traslado-tapiceria.imprimirFinal');
+    Route::get('/imprimir-historico/{id}', [TrasladoTapiceriaController::class, 'imprimirHistorico'])->name('traslado-tapiceria.imprimirHistorico');
+    Route::get('/imprimir-anulada/{id}', [TrasladoTapiceriaController::class, 'imprimirAnular'])->name('traslado-tapiceria.imprimirAnular');
+});
 
 
+Route::middleware(['auth'])->prefix('tapizado-terminado')->group(function () {
+    Route::get('/', [TapizadoTerminadoController::class, 'index'])->name('tapizado-terminado.index');
+    Route::get('/create', [TapizadoTerminadoController::class, 'create'])->name('tapizado-terminado.create');
+    Route::post('/', [TapizadoTerminadoController::class, 'store'])->name('tapizado-terminado.store');
+    Route::get('/datatable', [TapizadoTerminadoController::class, 'datatable'])->name('tapizado-terminado.datatable');
+    Route::get('/edit/{id}', [TapizadoTerminadoController::class, 'edit'])->name('tapizado-terminado.edit');
+    Route::post('/update', [TapizadoTerminadoController::class, 'update'])->name('tapizado-terminado.update');
+    Route::delete('/{id}', [TapizadoTerminadoController::class, 'destroy'])->name('tapizado-terminado.delete');
+    Route::post('/saveDetalle', [TapizadoTerminadoController::class, 'guardarDetalle'])->name('tapizado-terminado.saveDetalle');
+    Route::get('/getDetalle/{id}', [TapizadoTerminadoController::class, 'cargarDetalles'])->name('tapizado-terminado.getDetalle');
+    Route::delete('/deleteDetalle/{id}', [TapizadoTerminadoController::class, 'borrarDetalle'])->name('tapizado-terminado.deleteDetalle');
+    Route::put('/updateDetalle/{id}/{cant}', [TapizadoTerminadoController::class, 'actualizarDetalle'])->name('tapizado-terminado.updateDetalle');
+    Route::get('/imprimir-preliminar/{id}', [TapizadoTerminadoController::class, 'imprimirPreliminar'])->name('tapizado-terminado.imprimirPreliminar');
+    Route::get('/imprimir-final/{id}', [TapizadoTerminadoController::class, 'imprimirFinal'])->name('tapizado-terminado.imprimirFinal');
+    Route::get('/imprimir-historico/{id}', [TapizadoTerminadoController::class, 'imprimirHistorico'])->name('tapizado-terminado.imprimirHistorico');
+    Route::get('/imprimir-anulada/{id}', [TapizadoTerminadoController::class, 'imprimirAnular'])->name('tapizado-terminado.imprimirAnular');
+});
+
+Route::middleware(['auth'])->prefix('reporte-disponibilidad')->group(function () {
+    Route::get('/', [ReporteDisponibilidad::class, 'index'])->name('reporte-disponibilidad.index');
+    Route::post('/generar-reporte', [ReporteDisponibilidad::class, 'generarReporte'])
+    ->name('reporte-disponibilidad.pdf');
+});

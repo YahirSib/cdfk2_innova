@@ -32,7 +32,8 @@ class PiezasController extends Controller
             'descripcion' => 'nullable|string|max:225',
             'estado' => 'required|integer|min:0|in:1,2',
             'costo_cacastero' => 'required|numeric|min:0',
-            'costo_tapicero' => 'required|numeric|min:0'
+            'costo_tapicero' => 'required|numeric|min:0',
+            'individual_valor' => 'required|integer|min:0|in:0,1',
         ],
         [
             'codigo.required' => 'El codigo es obligatorio',
@@ -44,6 +45,8 @@ class PiezasController extends Controller
             'costo_tapicero.numeric' => 'El costo por tapicero debe ser un número',
             'costo_cacastero.min' => 'El costo por cacastero debe ser mayor o igual a 0',
             'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
+            'individual_valor.required' => 'El campo individual es obligatorio',
+            'individual_valor.integer' => 'El campo individual debe ser un número entero',
         ]);
 
         $codigoExiste = Pieza::where('codigo', $pieza->codigo)->first();
@@ -57,6 +60,7 @@ class PiezasController extends Controller
         $pieza->estado = $pieza->estado;
         $pieza->costo_cacastero = $pieza->costo_cacastero;
         $pieza->costo_tapicero = $pieza->costo_tapicero;
+        $pieza->individual = $request->input('individual_valor') == 1 ? 1 : 0;
 
         if($pieza->save()){
             return response()->json(['success' => true, 'message' => 'Pieza creada exitosamente.']);
@@ -93,7 +97,8 @@ class PiezasController extends Controller
             'descripcion' => 'nullable|string|max:225',
             'estado' => 'required|integer|min:0|in:1,2',
             'costo_cacastero' => 'required|numeric|min:0',
-            'costo_tapicero' => 'required|numeric|min:0'
+            'costo_tapicero' => 'required|numeric|min:0',
+            'individual_valor' => 'required|integer|min:0|in:0,1',
         ],
         [
             'codigo.required' => 'El codigo es obligatorio',
@@ -105,6 +110,8 @@ class PiezasController extends Controller
             'costo_tapicero.numeric' => 'El costo por tapicero debe ser un número',
             'costo_cacastero.min' => 'El costo por cacastero debe ser mayor o igual a 0',
             'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
+            'individual_valor.required' => 'El campo individual es obligatorio',
+            'individual_valor.integer' => 'El campo individual debe ser un número entero',
         ]);
         $pieza->codigo = strtoupper($pieza->codigo);
         $pieza->nombre = strtoupper($pieza->nombre);
@@ -112,7 +119,8 @@ class PiezasController extends Controller
         $pieza->estado = $pieza->estado;
         $pieza->costo_cacastero = $pieza->costo_cacastero;
         $pieza->costo_tapicero = $pieza->costo_tapicero;
-        
+        $pieza->individual = $request->input('individual_valor') == 1 ? 1 : 0;
+
         if($pieza->save()){
             return response()->json(['success' => true, 'message' => 'Pieza actualizada exitosamente.']);  
         }else{
@@ -149,6 +157,7 @@ class PiezasController extends Controller
             'nombre',
             'estado',
             'existencia',
+            'individual'
         ]);
         
         return datatables()->of($piezas)
@@ -173,6 +182,7 @@ class PiezasController extends Controller
             ->select('id_pieza as id', 'codigo', 'nombre')
             ->where('codigo', 'like', "%{$term}%")
             ->orWhere('nombre', 'like', "%{$term}%")
+            ->where('estado', 1)
             ->get()
             ->map(function ($item) {
                 return [
@@ -182,6 +192,67 @@ class PiezasController extends Controller
             });
 
         return response()->json($piezas);
+    }
+
+    public function getPiezasDisponibles(Request $request){
+        $term = $request->val;
+        $id_trabajador = $request->id_trabajador;
+
+        $piezas = DB::table('piezas')
+            ->select('id_pieza as id', 'codigo', 'nombre')
+            ->where(function ($query) use ($term) {
+                $query->where('codigo', 'like', "%{$term}%")
+                    ->orWhere('nombre', 'like', "%{$term}%");
+            })
+            ->where('estado', 1);
+
+        if($request->has('individual')){
+            $piezas->where('individual', $request->individual == 1 ? 1 : 0);
+        }
+
+        $data = $piezas->get()
+            ->map(function ($item) use ($id_trabajador) {
+                $disponibilidad = (new \App\Services\PiezasServices())->disPiezaByTrabajador($item->id, $id_trabajador);
+                
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                    'disponibilidad' => $disponibilidad, 
+                ];
+            })
+            ->values();
+        
+        return response()->json($data);
+    }
+
+    public function getPiezasDisponiblesTraslado(Request $request){
+        $term = $request->val;
+
+        $piezas = DB::table('piezas')
+            ->select('id_pieza as id', 'codigo', 'nombre')
+            ->where(function ($query) use ($term) {
+                $query->where('codigo', 'like', "%{$term}%")
+                    ->orWhere('nombre', 'like', "%{$term}%");
+            })
+            ->where('estado', 1);
+
+        if($request->has('individual')){
+            $piezas->where('individual', $request->individual == 1 ? 1 : 0);
+        }
+
+        $data = $piezas->get()
+            ->map(function ($item) {
+                $disponibilidad = (new \App\Services\PiezasServices())->disPiezaTraslado($item->id);
+                
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                    'disponibilidad' => $disponibilidad, 
+                ];
+            })
+            ->values();
+        
+        return response()->json($data);
     }
 
 }

@@ -21,6 +21,7 @@ class CreateInvMovimientoTable extends Migration
             $table->integer('correlativo');
             $table->dateTime('fecha_impresion')->nullable();
             $table->dateTime('fecha_anulacion')->nullable();
+            $table->integer('fk_doc_afecta')->nullable();
         });
     }
 
