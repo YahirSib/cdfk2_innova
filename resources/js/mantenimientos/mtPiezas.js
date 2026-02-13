@@ -278,6 +278,7 @@ $(function() {
                     $('#estado').val(response.data.estado);
                     $('#costo_tapicero').val(response.data.costo_tapicero);
                     $('#costo_cacastero').val(response.data.costo_cacastero);
+                    $('#precio_venta').val(response.data.precio_venta);
                     $('#existencia').val(response.data.existencia);
                     $('#descripcion').val(response.data.descripcion);
                     if(response.data.individual == 1){
@@ -356,6 +357,7 @@ $(function() {
                                 <p class="p-1"><strong>Estado:</strong> ${estadoTexto}</p>
                                 <p class="p-1"><strong>Costo Tapicero:</strong> ${pieza.costo_tapicero ?? 'N/A'}</p>
                                 <p class="p-1"><strong>Costo Cacastero:</strong> ${pieza.costo_cacastero ?? 'N/A'}</p>
+                                <p class="p-1"><strong>Precio Venta:</strong> ${pieza.precio_venta ?? 'N/A'}</p>
                                 <p class="p-1"><strong>Descipción:</strong> ${pieza.descripcion ?? 'N/A'}</p>
                             </div>
                         `,

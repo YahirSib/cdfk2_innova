@@ -43,9 +43,14 @@
                     </select>
                 </div>
 
-                <div>
+                {{-- <div>
                     <label for="existencia" class="block mb-2 text-sm font-medium text-gray-900">Existencia </label>
                     <input type="text" readonly id="existencia" name="existencia" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="Información de existencia">
+                </div> --}}
+
+                <div>
+                    <label for="precio_venta" class="block mb-2 text-sm font-medium text-gray-900">Precio Venta </label>
+                    <input type="text" id="precio_venta" name="precio_venta" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el precio de venta">
                 </div>
                 
                 <!-- Tipo -->

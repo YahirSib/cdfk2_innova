@@ -18,7 +18,8 @@ class Salas extends Model
         'descripcion',
         'costo_cacastero',
         'costo_tapicero',
-        'estado'
+        'estado',
+        'precio_venta'
     ];
 
     protected $casts = [
@@ -28,7 +29,8 @@ class Salas extends Model
         'descripcion' => 'string',
         'costo_cacastero' => 'double',
         'costo_tapicero' => 'double',
-        'estado' => 'int'
+        'estado' => 'int',
+        'precio_venta' => 'double'
     ];
 
     public function totalizarExistencias()

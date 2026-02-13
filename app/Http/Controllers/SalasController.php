@@ -24,6 +24,7 @@ class SalasController extends Controller
         $salas->descripcion = $request->input('descripcion');
         $salas->costo_cacastero = $request->input('costo_cacastero');
         $salas->costo_tapicero = $request->input('costo_tapicero');
+        $salas->precio_venta = $request->input('precio_venta');
         $salas->estado = $request->input('estado');
 
         $request->validate([
@@ -33,6 +34,7 @@ class SalasController extends Controller
             'costo_cacastero' => 'required|numeric|min:0',
             'costo_tapicero' => 'required|numeric|min:0',
             'estado' => 'required|integer|min:0|in:1,2',
+            'precio_venta' => 'numeric|min:0',
         ],
         [
             'codigo.required' => 'El codigo es obligatorio',
@@ -45,6 +47,8 @@ class SalasController extends Controller
             'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
             'estado.required' => 'El estado es obligatorio',
             'estado.in' => 'El estado debe ser seleccionado',
+            'precio_venta.numeric' => 'El precio de venta debe ser un número',
+            'precio_venta.min' => 'El precio de venta debe ser mayor o igual a 0',
         ]);
         $codigoExiste = Salas::where('codigo', $salas->codigo)->first();
         if($codigoExiste){
@@ -56,6 +60,7 @@ class SalasController extends Controller
         $salas->descripcion = strtoupper($salas->descripcion);
         $salas->costo_cacastero = $salas->costo_cacastero;
         $salas->costo_tapicero = $salas->costo_tapicero;
+        $salas->precio_venta = $salas->precio_venta;
         $salas->estado = $salas->estado;
 
         try {
@@ -78,9 +83,9 @@ class SalasController extends Controller
         return response()->json(['success' => true, 'data' => $salas]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $salas = Salas::find($id);
+        $salas = Salas::find($request->input('id_salas'));
         if (!$salas) {
             return response()->json(['success' => false, 'message' => 'Sala no encontrada.']);
         }
@@ -92,6 +97,7 @@ class SalasController extends Controller
             'costo_cacastero' => 'required|numeric|min:0',
             'costo_tapicero' => 'required|numeric|min:0',
             'estado' => 'required|integer|min:0|in:1,2',
+            'precio_venta' => 'numeric|min:0',
         ],
         [
             'codigo.required' => 'El codigo es obligatorio',
@@ -104,9 +110,11 @@ class SalasController extends Controller
             'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
             'estado.required' => 'El estado es obligatorio',
             'estado.in' => 'El estado debe ser seleccionado',
+            'precio_venta.numeric' => 'El precio de venta debe ser un número',
+            'precio_venta.min' => 'El precio de venta debe ser mayor o igual a 0',
         ]);
 
-        $codigoExiste = Salas::where('codigo', $salas->codigo)->where('id_salas', '<>', $id)->first();
+        $codigoExiste = Salas::where('codigo', $salas->codigo)->where('id_salas', '<>', $salas->id_salas)->first();
         if($codigoExiste){
             throw new \Exception('El codigo ingresado ya existe.');
         }
@@ -116,6 +124,7 @@ class SalasController extends Controller
         $salas->descripcion = strtoupper($request->input('descripcion'));
         $salas->costo_cacastero = $request->input('costo_cacastero');
         $salas->costo_tapicero = $request->input('costo_tapicero');
+        $salas->precio_venta = $request->input('precio_venta');
         $salas->estado = $request->input('estado');
 
         try {
@@ -160,6 +169,8 @@ class SalasController extends Controller
             'nombre',
             'estado',
             'existencia',
+            'existencia_tapizado',
+            'existencia_traslado'
         ]);
         
         return datatables()->of($salas)

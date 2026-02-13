@@ -17,7 +17,8 @@ class Pieza extends Model
         'estado',
         'costo_cacastero',
         'costo_tapicero',
-        'individual'
+        'individual',
+        'precio_venta'
     ];
 
     protected $casts = [
@@ -28,7 +29,8 @@ class Pieza extends Model
         'estado' => 'int',
         'costo_cacastero' => 'double',
         'costo_tapicero' => 'double',
-        'individual' => 'int'
+        'individual' => 'int',
+        'precio_venta' => 'double'
     ];
 
     public function totalizarExistencias()

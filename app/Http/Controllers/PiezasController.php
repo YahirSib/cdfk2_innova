@@ -25,6 +25,7 @@ class PiezasController extends Controller
         $pieza->estado = $request->input('estado');
         $pieza->costo_cacastero = $request->input('costo_cacastero');
         $pieza->costo_tapicero = $request->input('costo_tapicero');
+        $pieza->precio_venta = $request->input('precio_venta');
 
         $request->validate([
             'codigo' => 'required|string|max:225',
@@ -34,6 +35,7 @@ class PiezasController extends Controller
             'costo_cacastero' => 'required|numeric|min:0',
             'costo_tapicero' => 'required|numeric|min:0',
             'individual_valor' => 'required|integer|min:0|in:0,1',
+            'precio_venta' => 'numeric|min:0',
         ],
         [
             'codigo.required' => 'El codigo es obligatorio',
@@ -47,6 +49,8 @@ class PiezasController extends Controller
             'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
             'individual_valor.required' => 'El campo individual es obligatorio',
             'individual_valor.integer' => 'El campo individual debe ser un número entero',
+            'precio_venta.numeric' => 'El precio de venta debe ser un número',
+            'precio_venta.min' => 'El precio de venta debe ser mayor o igual a 0',
         ]);
 
         $codigoExiste = Pieza::where('codigo', $pieza->codigo)->first();
@@ -61,6 +65,7 @@ class PiezasController extends Controller
         $pieza->costo_cacastero = $pieza->costo_cacastero;
         $pieza->costo_tapicero = $pieza->costo_tapicero;
         $pieza->individual = $request->input('individual_valor') == 1 ? 1 : 0;
+        $pieza->precio_venta = $pieza->precio_venta;
 
         if($pieza->save()){
             return response()->json(['success' => true, 'message' => 'Pieza creada exitosamente.']);
@@ -91,6 +96,7 @@ class PiezasController extends Controller
         $pieza->estado = $request->input('estado');
         $pieza->costo_cacastero = $request->input('costo_cacastero');
         $pieza->costo_tapicero = $request->input('costo_tapicero');
+        $pieza->precio_venta = $request->input('precio_venta');
         $request->validate([
             'codigo' => 'required|string|max:225',
             'nombre' => 'required|string|max:225',
@@ -99,6 +105,7 @@ class PiezasController extends Controller
             'costo_cacastero' => 'required|numeric|min:0',
             'costo_tapicero' => 'required|numeric|min:0',
             'individual_valor' => 'required|integer|min:0|in:0,1',
+            'precio_venta' => 'numeric|min:0',
         ],
         [
             'codigo.required' => 'El codigo es obligatorio',
@@ -112,6 +119,8 @@ class PiezasController extends Controller
             'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
             'individual_valor.required' => 'El campo individual es obligatorio',
             'individual_valor.integer' => 'El campo individual debe ser un número entero',
+            'precio_venta.numeric' => 'El precio de venta debe ser un número',
+            'precio_venta.min' => 'El precio de venta debe ser mayor o igual a 0',
         ]);
         $pieza->codigo = strtoupper($pieza->codigo);
         $pieza->nombre = strtoupper($pieza->nombre);
@@ -119,6 +128,7 @@ class PiezasController extends Controller
         $pieza->estado = $pieza->estado;
         $pieza->costo_cacastero = $pieza->costo_cacastero;
         $pieza->costo_tapicero = $pieza->costo_tapicero;
+        $pieza->precio_venta = $pieza->precio_venta;
         $pieza->individual = $request->input('individual_valor') == 1 ? 1 : 0;
 
         if($pieza->save()){
@@ -157,6 +167,8 @@ class PiezasController extends Controller
             'nombre',
             'estado',
             'existencia',
+            'existencia_traslado',
+            'existencia_tapizado',
             'individual'
         ]);
         

@@ -275,6 +275,7 @@ $(function() {
                     $('#estado').val(response.data.estado);
                     $('#costo_tapicero').val(response.data.costo_tapicero);
                     $('#costo_cacastero').val(response.data.costo_cacastero);
+                    $('#precio_venta').val(response.data.precio_venta);
                     $('#existencia').val(response.data.existencia);
                     $('#descripcion').val(response.data.descripcion);
 
@@ -345,6 +346,7 @@ $(function() {
                             <div class="text-left">
                                 <p class="p-1"><strong>Sala:</strong> ${sala.codigo} | ${sala.nombre} </p>
                                 <p class="p-1"><strong>Estado:</strong> ${estadoTexto}</p>
+                                <p class="p-1"><strong>Precio Venta:</strong> ${sala.precio_venta ?? 'N/A'}</p>
                                 <p class="p-1"><strong>Costo Tapicero:</strong> ${sala.costo_tapicero ?? 'N/A'}</p>
                                 <p class="p-1"><strong>Costo Cacastero:</strong> ${sala.costo_cacastero ?? 'N/A'}</p>
                                 <p class="p-1"><strong>Descipción:</strong> ${sala.descripcion ?? 'N/A'}</p>
