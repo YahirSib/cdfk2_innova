@@ -31,4 +31,8 @@ class Detalle extends Model
     }
 
 
+    public function movimiento()
+    {
+        return $this->belongsTo(Movimiento::class, 'fk_movimiento', 'id_movimiento');
+    }
 }

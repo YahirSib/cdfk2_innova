@@ -60,10 +60,6 @@ class SalasController extends Controller
         $salas->codigo = strtoupper($salas->codigo);
         $salas->nombre = strtoupper($salas->nombre);
         $salas->descripcion = strtoupper($salas->descripcion);
-        $salas->costo_cacastero = $salas->costo_cacastero;
-        $salas->costo_tapicero = $salas->costo_tapicero;
-        $salas->precio_venta = $salas->precio_venta;
-        $salas->estado = $salas->estado;
 
         try {
             DB::beginTransaction();

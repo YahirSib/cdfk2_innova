@@ -26,7 +26,7 @@ Route::get('/logout', function () {
 })->name('logout')->middleware('auth');
 
 
-Route::get('/',[RenderAppController::class, 'index'])->middleware('auth')->name('index');
+Route::get('/', [RenderAppController::class, 'index'])->middleware('auth')->name('index');
 
 Route::middleware(['auth'])->prefix('perfil')->group(function () {
     Route::get('/', [PerfilController::class, 'index'])->name('perfil.index');
@@ -84,7 +84,7 @@ Route::middleware(['auth'])->prefix('salas')->group(function () {
     Route::post('/getSalasDisponibles', [SalasController::class, 'getSalasDisponibles'])->name('salas.getSalasDisponibles');
     Route::post('/getSalasDisponiblesTraslado', [SalasController::class, 'getSalasDisponiblesTraslado'])->name('salas.getSalasDisponiblesTraslado');
     Route::post('/getSalasDisponiblesTapizado', [SalasController::class, 'getSalasDisponiblesTapizado'])->name('salas.getSalasDisponiblesTapizado');
-     
+
 });
 
 Route::middleware(['auth'])->prefix('nota-pieza')->group(function () {
@@ -185,5 +185,13 @@ Route::middleware(['auth'])->prefix('venta-sala')->group(function () {
 Route::middleware(['auth'])->prefix('reporte-disponibilidad')->group(function () {
     Route::get('/', [ReporteDisponibilidad::class, 'index'])->name('reporte-disponibilidad.index');
     Route::post('/generar-reporte', [ReporteDisponibilidad::class, 'generarReporte'])
-    ->name('reporte-disponibilidad.pdf');
+        ->name('reporte-disponibilidad.pdf');
+});
+
+Route::middleware(['auth'])->prefix('reporte-cacastero')->group(function () {
+    Route::get('/', [App\Http\Controllers\ReporteCacasteroController::class, 'index'])->name('reporte-cacastero.index');
+    Route::post('/generar-reporte', [App\Http\Controllers\ReporteCacasteroController::class, 'generarReporte'])
+        ->name('reporte-cacastero.pdf');
+    Route::post('/generar-reporte-detallado', [App\Http\Controllers\ReporteCacasteroController::class, 'generarReporteDetallado'])
+        ->name('reporte-cacastero.detallado.pdf');
 });

@@ -63,11 +63,7 @@ class PiezasController extends Controller
         $pieza->codigo = strtoupper($pieza->codigo);
         $pieza->nombre = strtoupper($pieza->nombre);
         $pieza->descripcion = strtoupper($pieza->descripcion);
-        $pieza->estado = $pieza->estado;
-        $pieza->costo_cacastero = $pieza->costo_cacastero;
-        $pieza->costo_tapicero = $pieza->costo_tapicero;
         $pieza->individual = $request->input('individual_valor') == 1 ? 1 : 0;
-        $pieza->precio_venta = $pieza->precio_venta;
 
         if ($pieza->save()) {
             return response()->json(['success' => true, 'message' => 'Pieza creada exitosamente.']);
@@ -135,10 +131,6 @@ class PiezasController extends Controller
         $pieza->codigo = strtoupper($request->input('codigo'));
         $pieza->nombre = strtoupper($pieza->nombre);
         $pieza->descripcion = strtoupper($pieza->descripcion);
-        $pieza->estado = $pieza->estado;
-        $pieza->costo_cacastero = $pieza->costo_cacastero;
-        $pieza->costo_tapicero = $pieza->costo_tapicero;
-        $pieza->precio_venta = $pieza->precio_venta;
         $pieza->individual = $request->input('individual_valor') == 1 ? 1 : 0;
 
         if ($pieza->save()) {
