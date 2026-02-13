@@ -280,66 +280,79 @@ class VentaSalaController extends Controller
         }
     }
 
-    public function guardarDetalle(Request $request){
+    public function guardarDetalle(Request $request)
+    {
 
-        try{
+        try {
             DB::beginTransaction();
             $id_enca = $request->id_enca;
             $cantidad = $request->cantidad;
 
             $enca = Movimiento::find($id_enca);
-            if($request->has('id_pieza')){
-                $request->validate([
-                    'id_pieza' => 'required|integer|exists:piezas,id_pieza',
-                    'cantidad' => 'required|integer|min:1',
-                ],
-                [
-                    'id_pieza.required' => 'La pieza es obligatoria',
-                    'id_pieza.exists' => 'La pieza seleccionada no existe',
-                    'cantidad.required' => 'La cantidad es obligatoria',
-                    'cantidad.integer' => 'La cantidad debe ser un número entero',
-                    'cantidad.min' => 'La cantidad debe ser mayor o igual a 1',
-                ]);
+
+            if ($request->has('id_pieza')) {
+                $request->validate(
+                    [
+                        'id_pieza' => 'required|integer|exists:piezas,id_pieza',
+                        'cantidad' => 'required|integer|min:1',
+                        'costo_unitario' => 'required|numeric|min:0',
+                    ],
+                    [
+                        'id_pieza.required' => 'La pieza es obligatoria',
+                        'id_pieza.exists' => 'La pieza seleccionada no existe',
+                        'cantidad.required' => 'La cantidad es obligatoria',
+                        'cantidad.integer' => 'La cantidad debe ser un número entero',
+                        'cantidad.min' => 'La cantidad debe ser mayor o igual a 1',
+                        'costo_unitario.required' => 'El precio es obligatorio',
+                        'costo_unitario.numeric' => 'El precio debe ser un número',
+                        'costo_unitario.min' => 'El precio debe ser mayor o igual a 0',
+                    ]
+                );
 
                 $id_pieza = $request->id_pieza;
-                $precio = DB::table('piezas')->where('id_pieza', $id_pieza)->value('costo_tapicero');
-                
+                $precio = $request->costo_unitario;
+
                 $piezaService = new PiezasServices();
                 $valor = $piezaService->disPiezaTapizado($id_pieza);
 
-                if($valor <= 0){
+                if ($valor <= 0) {
                     return response()->json(['success' => false, 'message' => 'No hay piezas disponibles para ' . $this->nombre_doc . '.']);
                 }
 
-                if($cantidad > $valor){
+                if ($cantidad > $valor) {
                     return response()->json(['success' => false, 'message' => 'La cantidad solicitada supera la disponibilidad de la pieza seleccionada.']);
                 }
-
             }
 
-            if($request->has('id_salas')){
-                $request->validate([
-                    'id_salas' => 'required|integer|exists:salas,id_salas',
-                    'cantidad' => 'required|integer|min:1',
-                ],
-                [
-                    'id_salas.required' => 'La sala es obligatoria',
-                    'id_salas.exists' => 'La sala seleccionada no existe',
-                    'cantidad.required' => 'La cantidad es obligatoria',
-                    'cantidad.integer' => 'La cantidad debe ser un número entero',
-                    'cantidad.min' => 'La cantidad debe ser mayor o igual a 1',
-                ]);
+            if ($request->has('id_salas')) {
+                $request->validate(
+                    [
+                        'id_salas' => 'required|integer|exists:salas,id_salas',
+                        'cantidad' => 'required|integer|min:1',
+                        'costo_unitario' => 'required|numeric|min:0',
+                    ],
+                    [
+                        'id_salas.required' => 'La sala es obligatoria',
+                        'id_salas.exists' => 'La sala seleccionada no existe',
+                        'cantidad.required' => 'La cantidad es obligatoria',
+                        'cantidad.integer' => 'La cantidad debe ser un número entero',
+                        'cantidad.min' => 'La cantidad debe ser mayor o igual a 1',
+                        'costo_unitario.required' => 'El precio es obligatorio',
+                        'costo_unitario.numeric' => 'El precio debe ser un número',
+                        'costo_unitario.min' => 'El precio debe ser mayor o igual a 0',
+                    ]
+                );
 
                 $id_salas = $request->id_salas;
-                $precio = DB::table('salas')->where('id_salas', $id_salas)->value('costo_tapicero');
+                $precio = $request->costo_unitario;
 
                 $salasService = new SalasServices();
                 $valor = $salasService->disSalasTapizado($id_salas);
-                if($valor <= 0){
+                if ($valor <= 0) {
                     return response()->json(['success' => false, 'message' => 'No hay salas disponibles para ' . $this->nombre_doc . '.']);
                 }
 
-                if($cantidad > $valor){
+                if ($cantidad > $valor) {
                     return response()->json(['success' => false, 'message' => 'La cantidad solicitada supera la disponibilidad de la sala seleccionada.']);
                 }
             }
@@ -347,10 +360,10 @@ class VentaSalaController extends Controller
 
             $detalle = new Detalle();
             $detalle->fk_movimiento = $id_enca;
-            if(isset($id_pieza)){
+            if (isset($id_pieza)) {
                 $detalle->fk_pieza = $id_pieza;
             }
-            if(isset($id_salas)){
+            if (isset($id_salas)) {
                 $detalle->fk_sala = $id_salas;
             }
             $detalle->costo_unitario = $precio;
@@ -363,81 +376,94 @@ class VentaSalaController extends Controller
             Movimiento::where('id_movimiento', $id_enca)->update(['total' => $total]);
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Detalle guardado con éxito.']);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage() ]);
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
-    public function cargarDetalles($id = null){
+    public function cargarDetalles($id = null)
+    {
 
-        try{
+        try {
             $detalle = Detalle::with(['pieza', 'sala'])->where('fk_movimiento', $id)->get();
 
             $total_pieza = 0;
             $total_sala = 0;
 
-            foreach($detalle as $item){
-                if( !is_null($item->fk_pieza)){
+            foreach ($detalle as $item) {
+                if (!is_null($item->fk_pieza)) {
                     $total_pieza += $item->unidades;
                 }
-                if( !is_null($item->fk_sala)){
+                if (!is_null($item->fk_sala)) {
                     $total_sala += $item->unidades;
                 }
             }
 
             return response()->json(['success' => true, 'data' => $detalle, 'total_pieza' => $total_pieza, 'total_sala' => $total_sala]);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error al cargar los detalles, contacte con Soporte Técnico.']);
-        } 
+        }
 
     }
 
-    public function actualizarDetalle($id = null, $cant = null, Request $request){
-        try{
+    public function actualizarDetalle($id = null, $cant = null, Request $request)
+    {
+        try {
             $detalle = Detalle::find($id);
             $id_enca = $detalle->fk_movimiento;
 
-            if($cant <= 0){
+            if ($cant <= 0) {
                 return response()->json(['success' => false, 'message' => 'La cantidad debe ser mayor a cero.']);
             }
 
             $enca = Movimiento::find($id_enca);
             $tapicero = $enca->tapicero;
 
-            if($detalle->fk_pieza){
+            if ($detalle->fk_pieza) {
                 $id_pieza = $detalle->fk_pieza;
                 $piezaService = new PiezasServices();
                 $valor = $piezaService->disPiezaTapizado($id_pieza) + $detalle->unidades;
-                if($cant > $valor){
+                if ($cant > $valor) {
                     return response()->json(['success' => false, 'message' => 'La cantidad solicitada supera la disponibilidad de la pieza seleccionada.']);
                 }
             }
 
-            if($detalle->fk_sala){
+            if ($detalle->fk_sala) {
                 $id_salas = $detalle->fk_sala;
                 $salasService = new SalasServices();
                 $valor = $salasService->disSalasTapizado($id_salas) + $detalle->unidades;
-                if($cant > $valor){
+                if ($cant > $valor) {
                     return response()->json(['success' => false, 'message' => 'La cantidad solicitada supera la disponibilidad de la sala seleccionada.']);
                 }
             }
 
             $cantidad = $cant;
             $detalle->unidades = $cantidad;
+
+            if ($request->has('precio')) {
+                $precio = $request->precio;
+                if ($precio < 0) {
+                    return response()->json(['success' => false, 'message' => 'El precio debe ser mayor o igual a cero.']);
+                }
+                $detalle->costo_unitario = $precio;
+            }
+
+            $detalle->costo_total = round($detalle->unidades * $detalle->costo_unitario, 2);
             $detalle->save();
 
             $movimiento = Movimiento::find($id_enca);
             $total = $movimiento->totalizar();
             Movimiento::where('id_movimiento', $id_enca)->update(['total' => $total]);
             return response()->json(['success' => true, 'message' => 'Detalle actualizado con éxito.']);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
-    public function borrarDetalle($id = null){
-        try{
+    public function borrarDetalle($id = null)
+    {
+        try {
             DB::beginTransaction();
             $detalle = Detalle::find($id);
             $fk_movimiento = $detalle->fk_movimiento;
@@ -449,15 +475,16 @@ class VentaSalaController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Detalle eliminado con éxito.']);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Error al eliminar el detalle, contacte con Soporte Técnico.']);
         }
     }
 
-    public function imprimirPreliminar($id){
+    public function imprimirPreliminar($id)
+    {
         $data = [];
-        $data['title'] = strtoupper( $this->nombre_doc . ' PRELIMINAR');
+        $data['title'] = strtoupper($this->nombre_doc . ' PRELIMINAR');
         $entrada = Movimiento::find($id);
         $data['entrada'] = $entrada;
         $data['correlativo'] = $entrada->correlativo_formateado;
@@ -471,9 +498,10 @@ class VentaSalaController extends Controller
         return $this->renderPDF($entrada, $detalles_pieza, $detalles_sala, $total, $totalUnidades, $data);
     }
 
-     public function imprimirFinal($id){
+    public function imprimirFinal($id)
+    {
         $data = [];
-        $data['title'] = strtoupper( $this->nombre_doc);
+        $data['title'] = strtoupper($this->nombre_doc);
         $entrada = Movimiento::find($id);
         $data['entrada'] = $entrada;
         $data['correlativo'] = $entrada->correlativo_formateado;
@@ -485,7 +513,7 @@ class VentaSalaController extends Controller
         $totalUnidades = $entrada->totalizarUnidades();
 
         $entrada->estado = 'I'; // Cambiar el estado a Inactivo
-        $entrada->fecha_impresion = now(); 
+        $entrada->fecha_impresion = now();
         $entrada->save();
 
         foreach ($detalles_pieza as $detalle) {

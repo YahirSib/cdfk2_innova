@@ -143,6 +143,15 @@
                             placeholder="Ingrese la cantidad de piezas">
                     </div>
 
+                    <div class="md:col-span-3 lg:col-span-5 mb-2">
+                        <label for="precio_pieza"
+                            class="block mb-2 text-sm md:text-left font-medium text-gray-900">Precio<span
+                                class="text-red-500">(*)</span> </label>
+                        <input type="number" step="0.01" id="precio_pieza" name="precio_pieza"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="0.00">
+                    </div>
+
                     <div class="md:col-span-6 lg:col-span-10 mb-2">
                         <label for="comentario" class="block mb-2 text-sm font-medium text-gray-900"> </label>
                         <button {{ $data['action'] == 'crear' ? 'disabled' : '' }} id="btnGuardarPieza" type="submit"
@@ -171,6 +180,15 @@
                         <input type="text" id="cantidad_salas" name="cantidad_salas"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                             placeholder="Ingrese la cantidad de salas">
+                    </div>
+
+                    <div class="md:col-span-3 lg:col-span-5 mb-2">
+                        <label for="precio_sala"
+                            class="block mb-2 text-sm md:text-left font-medium text-gray-900">Precio<span
+                                class="text-red-500">(*)</span> </label>
+                        <input type="number" step="0.01" id="precio_sala" name="precio_sala"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="0.00">
                     </div>
 
                     <div class="md:col-span-6 lg:col-span-10 mb-2">
