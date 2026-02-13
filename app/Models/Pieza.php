@@ -17,7 +17,8 @@ class Pieza extends Model
         'estado',
         'costo_cacastero',
         'costo_tapicero',
-        'individual'
+        'individual',
+        'precio_venta'
     ];
 
     protected $casts = [
@@ -28,7 +29,8 @@ class Pieza extends Model
         'estado' => 'int',
         'costo_cacastero' => 'double',
         'costo_tapicero' => 'double',
-        'individual' => 'int'
+        'individual' => 'int',
+        'precio_venta' => 'double'
     ];
 
     public function totalizarExistencias()
@@ -37,7 +39,7 @@ class Pieza extends Model
             ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
             ->where('d.fk_pieza', $this->id_pieza)
             ->where('m.estado', 'I')
-            ->whereNotIn('m.tipo_doc', ['TT', 'V1'])
+            ->whereNotIn('m.tipo_doc', ['TT', 'VS'])
             ->selectRaw("
                 SUM(CASE 
                     WHEN m.tipo_mov = 'E' THEN d.unidades
@@ -75,7 +77,7 @@ class Pieza extends Model
             ->join('inv_movimiento as m', 'd.fk_movimiento', '=', 'm.id_movimiento')
             ->where('d.fk_pieza', $this->id_pieza)
             ->where('m.estado', 'I')
-            ->whereIn('m.tipo_doc', ['TT', 'V1'])
+            ->whereIn('m.tipo_doc', ['TT', 'VS'])
             ->selectRaw("
                 SUM(CASE 
                     WHEN m.tipo_mov = 'E' THEN d.unidades

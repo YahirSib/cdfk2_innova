@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Traslado a Tapiceria - {{ $entrada->correlativo }}</title>
+    <title>Venta de Salas - {{ $entrada->correlativo }}</title>
     <style>
         * {
             box-sizing: border-box;
@@ -113,6 +114,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="document">
         <div class="header">
@@ -125,7 +127,7 @@
 
         <table class="info-table">
             <tr>
-                <td><strong>Carpintero:</strong> {{$data['cacastero']}}</td>
+                <td><strong>Cliente:</strong> {{$data['cliente']}}</td>
                 <td style="text-align: right;"><strong>Fecha Documento:</strong> {{$data['fecha_ingreso']}}</td>
             </tr>
         </table>
@@ -133,15 +135,15 @@
         <table class="table-detalle">
             <thead>
                 <tr colspan="6">
-                    <th colspan="6">Tapizado de Salas</th>
+                    <th colspan="6">Venta de Salas</th>
                 </tr>
                 <tr>
                     <th>#</th>
                     <th>Cod. Sala</th>
                     <th>Nombre de Sala</th>
                     <th>Cantidad</th>
-                    <th>Costo Unitario</th>
-                    <th>Costo Total</th>
+                    <th>Precio Unitario</th>
+                    <th>Precio Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -162,22 +164,22 @@
                         <td colspan="6" style="text-align: center;">No hay salas trasladadas.</td>
                     </tr>
                 @endif
-               
+
             </tbody>
         </table>
 
         <table class="table-detalle">
             <thead>
                 <tr colspan="6">
-                    <th colspan="6" class="center">Tapizado de Piezas</th>
+                    <th colspan="6" class="center">Venta de Piezas</th>
                 </tr>
                 <tr>
                     <th>#</th>
                     <th>Cod. Pieza</th>
                     <th>Nombre de Pieza</th>
                     <th>Cantidad</th>
-                    <th>Costo Unitario</th>
-                    <th>Costo Total</th>
+                    <th>Precio Unitario</th>
+                    <th>Precio Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -185,13 +187,13 @@
                     @foreach($detalles_pieza as $index => $detalle)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                        <td>{{ $detalle->pieza->codigo }}</td>
-                        <td>{{ $detalle->pieza->nombre }}</td>
-                        <td class="right">{{ $detalle->unidades }}</td>
-                        <td class="right">${{ number_format($detalle->costo_unitario, 2) }}</td>
-                        <td class="right">${{ number_format($detalle->costo_total, 2) }}</td>
-                    </tr>
-                @endforeach
+                            <td>{{ $detalle->pieza->codigo }}</td>
+                            <td>{{ $detalle->pieza->nombre }}</td>
+                            <td class="right">{{ $detalle->unidades }}</td>
+                            <td class="right">${{ number_format($detalle->costo_unitario, 2) }}</td>
+                            <td class="right">${{ number_format($detalle->costo_total, 2) }}</td>
+                        </tr>
+                    @endforeach
                 @else
                     <tr>
                         <td colspan="6" style="text-align: center;">No hay piezas trasladadas.</td>
@@ -202,7 +204,7 @@
 
         <table class="totals">
             <tr>
-                <td class="right bold">Total Costo:</td>
+                <td class="right bold">Total Precio:</td>
                 <td class="right">${{ number_format($total, 2) }}</td>
             </tr>
         </table>
@@ -216,4 +218,5 @@
         </div>
     </div>
 </body>
+
 </html>

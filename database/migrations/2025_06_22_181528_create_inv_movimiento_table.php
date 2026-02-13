@@ -22,6 +22,7 @@ class CreateInvMovimientoTable extends Migration
             $table->dateTime('fecha_impresion')->nullable();
             $table->dateTime('fecha_anulacion')->nullable();
             $table->integer('fk_doc_afecta')->nullable();
+            $table->string('cliente', 100)->nullable();
         });
     }
 

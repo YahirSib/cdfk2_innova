@@ -67,4 +67,32 @@ class PiezasServices
         return $entradas - $salidas; // O manejar el caso donde la pieza no existe
     }
 
+    public function disPiezaTapizado($id_pieza)
+    {
+
+        // Entradas
+        $entradas = Detalle::query()
+            ->select(DB::raw('IFNULL(SUM(unidades), 0) as total'))
+            ->join('inv_movimiento', 'inv_movimiento.id_movimiento', '=', 'inv_detalles.fk_movimiento')
+            ->where('inv_movimiento.tipo_mov', 'E')
+            ->where('inv_movimiento.tipo_doc', 'TT')
+            ->whereIn('inv_movimiento.estado', ['I', 'A'])
+            ->whereNotNull('inv_detalles.fk_pieza')
+            ->where('inv_detalles.fk_pieza', $id_pieza)
+            ->value('total');
+
+        // Salidas
+        $salidas = Detalle::query()
+            ->select(DB::raw('IFNULL(SUM(unidades), 0) as total'))
+            ->join('inv_movimiento', 'inv_movimiento.id_movimiento', '=', 'inv_detalles.fk_movimiento')
+            ->where('inv_movimiento.tipo_mov', 'S')
+            ->where('inv_movimiento.tipo_doc', 'VS')
+            ->whereIn('inv_movimiento.estado', ['I', 'A'])
+            ->whereNotNull('inv_detalles.fk_pieza')
+            ->where('inv_detalles.fk_pieza', $id_pieza)
+            ->value('total');
+
+        return $entradas - $salidas; // O manejar el caso donde la pieza no existe
+    }
+
 }

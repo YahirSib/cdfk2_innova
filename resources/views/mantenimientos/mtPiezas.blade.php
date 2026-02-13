@@ -69,18 +69,23 @@
                     <input type="text" id="nombre" name="nombre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Nombre de la pieza">
                 </div>
 
-                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1">
                     <label for="estado" class="block mb-2 text-sm font-medium text-gray-900">Estado <span class="text-red-500">(*)</span></label>
                     <select id="estado" name="estado" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <option value="0"> Seleccione una opción </option>
+                        <option value="0"> -- </option>
                         <option value="1">Activo</option>
                         <option value="2">Inactivo</option>
                     </select>
                 </div>
 
-                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1">
+                {{-- <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1">
                     <label for="existencia" class="block mb-2 text-sm font-medium text-gray-900">Existencia </label>
                     <input type="text" readonly id="existencia" name="existencia" class="bg-red-50 border border-red-300 text-red-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" placeholder="0">
+                </div> --}}
+                
+                <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2">
+                    <label for="precio_venta" class="block mb-2 text-sm font-medium text-gray-900">Precio Venta</label>
+                    <input type="text" id="precio_venta" name="precio_venta" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ingrese el precio de venta">
                 </div>
 
                 <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1">

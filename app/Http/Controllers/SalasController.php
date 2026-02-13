@@ -24,39 +24,42 @@ class SalasController extends Controller
         $salas->descripcion = $request->input('descripcion');
         $salas->costo_cacastero = $request->input('costo_cacastero');
         $salas->costo_tapicero = $request->input('costo_tapicero');
+        $salas->precio_venta = $request->input('precio_venta');
         $salas->estado = $request->input('estado');
 
-        $request->validate([
-            'codigo' => 'required|string|max:225',
-            'nombre' => 'required|string|max:225',
-            'descripcion' => 'nullable|string|max:225',
-            'costo_cacastero' => 'required|numeric|min:0',
-            'costo_tapicero' => 'required|numeric|min:0',
-            'estado' => 'required|integer|min:0|in:1,2',
-        ],
-        [
-            'codigo.required' => 'El codigo es obligatorio',
-            'nombre.required' => 'El nombre es obligatorio',
-            'costo_cacastero.required' => 'El costo por cacastero es obligatorio',
-            'costo_tapicero.required' => 'El costo por tapicero es obligatorio',
-            'costo_cacastero.numeric' => 'El costo por cacastero debe ser un número',
-            'costo_tapicero.numeric' => 'El costo por tapicero debe ser un número',
-            'costo_cacastero.min' => 'El costo por cacastero debe ser mayor o igual a 0',
-            'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
-            'estado.required' => 'El estado es obligatorio',
-            'estado.in' => 'El estado debe ser seleccionado',
-        ]);
+        $request->validate(
+            [
+                'codigo' => 'required|string|max:225',
+                'nombre' => 'required|string|max:225',
+                'descripcion' => 'nullable|string|max:225',
+                'costo_cacastero' => 'required|numeric|min:0',
+                'costo_tapicero' => 'required|numeric|min:0',
+                'estado' => 'required|integer|min:0|in:1,2',
+                'precio_venta' => 'numeric|min:0',
+            ],
+            [
+                'codigo.required' => 'El codigo es obligatorio',
+                'nombre.required' => 'El nombre es obligatorio',
+                'costo_cacastero.required' => 'El costo por cacastero es obligatorio',
+                'costo_tapicero.required' => 'El costo por tapicero es obligatorio',
+                'costo_cacastero.numeric' => 'El costo por cacastero debe ser un número',
+                'costo_tapicero.numeric' => 'El costo por tapicero debe ser un número',
+                'costo_cacastero.min' => 'El costo por cacastero debe ser mayor o igual a 0',
+                'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
+                'estado.required' => 'El estado es obligatorio',
+                'estado.in' => 'El estado debe ser seleccionado',
+                'precio_venta.numeric' => 'El precio de venta debe ser un número',
+                'precio_venta.min' => 'El precio de venta debe ser mayor o igual a 0',
+            ]
+        );
         $codigoExiste = Salas::where('codigo', $salas->codigo)->first();
-        if($codigoExiste){
+        if ($codigoExiste) {
             throw new \Exception('El codigo ingresado ya existe.');
         }
 
         $salas->codigo = strtoupper($salas->codigo);
         $salas->nombre = strtoupper($salas->nombre);
         $salas->descripcion = strtoupper($salas->descripcion);
-        $salas->costo_cacastero = $salas->costo_cacastero;
-        $salas->costo_tapicero = $salas->costo_tapicero;
-        $salas->estado = $salas->estado;
 
         try {
             DB::beginTransaction();
@@ -78,36 +81,41 @@ class SalasController extends Controller
         return response()->json(['success' => true, 'data' => $salas]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $salas = Salas::find($id);
+        $salas = Salas::find($request->input('id_salas'));
         if (!$salas) {
             return response()->json(['success' => false, 'message' => 'Sala no encontrada.']);
         }
 
-        $request->validate([
-            'codigo' => 'required|string|max:225',
-            'nombre' => 'required|string|max:225',
-            'descripcion' => 'nullable|string|max:225',
-            'costo_cacastero' => 'required|numeric|min:0',
-            'costo_tapicero' => 'required|numeric|min:0',
-            'estado' => 'required|integer|min:0|in:1,2',
-        ],
-        [
-            'codigo.required' => 'El codigo es obligatorio',
-            'nombre.required' => 'El nombre es obligatorio',
-            'costo_cacastero.required' => 'El costo por cacastero es obligatorio',
-            'costo_tapicero.required' => 'El costo por tapicero es obligatorio',
-            'costo_cacastero.numeric' => 'El cosresources/js/mantenimientos/mtPiezas.jsto por cacastero debe ser un número',
-            'costo_tapicero.numeric' => 'El costo por tapicero debe ser un número',
-            'costo_cacastero.min' => 'El costo por cacastero debe ser mayor o igual a 0',
-            'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
-            'estado.required' => 'El estado es obligatorio',
-            'estado.in' => 'El estado debe ser seleccionado',
-        ]);
+        $request->validate(
+            [
+                'codigo' => 'required|string|max:225',
+                'nombre' => 'required|string|max:225',
+                'descripcion' => 'nullable|string|max:225',
+                'costo_cacastero' => 'required|numeric|min:0',
+                'costo_tapicero' => 'required|numeric|min:0',
+                'estado' => 'required|integer|min:0|in:1,2',
+                'precio_venta' => 'numeric|min:0',
+            ],
+            [
+                'codigo.required' => 'El codigo es obligatorio',
+                'nombre.required' => 'El nombre es obligatorio',
+                'costo_cacastero.required' => 'El costo por cacastero es obligatorio',
+                'costo_tapicero.required' => 'El costo por tapicero es obligatorio',
+                'costo_cacastero.numeric' => 'El cosresources/js/mantenimientos/mtPiezas.jsto por cacastero debe ser un número',
+                'costo_tapicero.numeric' => 'El costo por tapicero debe ser un número',
+                'costo_cacastero.min' => 'El costo por cacastero debe ser mayor o igual a 0',
+                'costo_tapicero.min' => 'El costo por tapicero debe ser mayor o igual a 0',
+                'estado.required' => 'El estado es obligatorio',
+                'estado.in' => 'El estado debe ser seleccionado',
+                'precio_venta.numeric' => 'El precio de venta debe ser un número',
+                'precio_venta.min' => 'El precio de venta debe ser mayor o igual a 0',
+            ]
+        );
 
-        $codigoExiste = Salas::where('codigo', $salas->codigo)->where('id_salas', '<>', $id)->first();
-        if($codigoExiste){
+        $codigoExiste = Salas::where('codigo', $salas->codigo)->where('id_salas', '<>', $salas->id_salas)->first();
+        if ($codigoExiste) {
             throw new \Exception('El codigo ingresado ya existe.');
         }
 
@@ -116,6 +124,7 @@ class SalasController extends Controller
         $salas->descripcion = strtoupper($request->input('descripcion'));
         $salas->costo_cacastero = $request->input('costo_cacastero');
         $salas->costo_tapicero = $request->input('costo_tapicero');
+        $salas->precio_venta = $request->input('precio_venta');
         $salas->estado = $request->input('estado');
 
         try {
@@ -126,7 +135,7 @@ class SalasController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Error al actualizar la sala.']);
-        }  
+        }
     }
 
     public function destroy($id)
@@ -138,7 +147,7 @@ class SalasController extends Controller
 
         $validar = DB::table('salas_piezas')->select('id_relacion')->where('id_sala', $salas->id_salas)->first();
 
-        if($validar) {
+        if ($validar) {
             return response()->json(['success' => false, 'message' => 'No se puede eliminar la sala porque tiene piezas asociadas.']);
         }
 
@@ -153,33 +162,36 @@ class SalasController extends Controller
         }
     }
 
-    public function datatable(){
+    public function datatable()
+    {
         $salas = Salas::select([
-            'id_salas', 
+            'id_salas',
             'codigo',
             'nombre',
             'estado',
             'existencia',
+            'existencia_tapizado',
+            'existencia_traslado'
         ]);
-        
+
         return datatables()->of($salas)
-            ->addColumn('acciones', function($sala) {
+            ->addColumn('acciones', function ($sala) {
                 return '
                 
             <div class="flex justify-evenly items-center gap-2">
-                <button id="btn_editar" data_id="'.$sala->id_salas.'" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-yellow-600 hover:text-yellow-400 bx bxs-edit"></i></button>
+                <button id="btn_editar" data_id="' . $sala->id_salas . '" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-yellow-600 hover:text-yellow-400 bx bxs-edit"></i></button>
 
-                <button id="btn_eliminar" data_id="'.$sala->id_salas.'" class="btn btn-sm btn-danger cursor-pointer"><i class=" text-2xl text-red-600 hover:text-red-400 bx bxs-trash"></i></button>
+                <button id="btn_eliminar" data_id="' . $sala->id_salas . '" class="btn btn-sm btn-danger cursor-pointer"><i class=" text-2xl text-red-600 hover:text-red-400 bx bxs-trash"></i></button>
                 
-                <button id="btn_ver" data_id="'.$sala->id_salas.'" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-blue-600 hover:text-blue-400 bx bxs-info-circle bx-rotate-180"></i>  </button>
+                <button id="btn_ver" data_id="' . $sala->id_salas . '" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-blue-600 hover:text-blue-400 bx bxs-info-circle bx-rotate-180"></i>  </button>
 
-                <button id="btn_settings" data_id="'.$sala->id_salas.'" data_sala="'.$sala->nombre.'" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-gray-600 hover:text-gray-400 bx bxs-cog bx-rotate-180"></i>  </button>
+                <button id="btn_settings" data_id="' . $sala->id_salas . '" data_sala="' . $sala->nombre . '" class="btn btn-sm btn-primary cursor-pointer"><i class=" text-2xl text-gray-600 hover:text-gray-400 bx bxs-cog bx-rotate-180"></i>  </button>
             </div>';
             })->rawColumns(['acciones'])
             ->toJson();
     }
 
-    
+
     public function savePiezas(Request $request)
     {
 
@@ -194,13 +206,13 @@ class SalasController extends Controller
         }
 
         $cantidad = $request->cantidad;
-        if(empty($cantidad) || !is_numeric($cantidad) || $cantidad <= 0) {
+        if (empty($cantidad) || !is_numeric($cantidad) || $cantidad <= 0) {
             return response()->json(['success' => false, 'message' => 'La cantidad debe ser un número mayor a 0.']);
         }
 
         $validacion = DB::table('salas_piezas')->select('id_relacion')->where('id_sala', $salas->id_salas)->where('id_pieza', $request->id_pieza);
 
-        if(!empty($validacion->first())) {
+        if (!empty($validacion->first())) {
             return response()->json(['success' => false, 'message' => 'La pieza ya se encuentra registrada en la sala.']);
         }
 
@@ -219,12 +231,13 @@ class SalasController extends Controller
         }
     }
 
-    public function obtenerPiezas($id_sala){
+    public function obtenerPiezas($id_sala)
+    {
         return DB::table('salas_piezas')
-        ->join('piezas', 'salas_piezas.id_pieza', '=', 'piezas.id_pieza')
-        ->select('salas_piezas.id_relacion', 'piezas.codigo' , 'piezas.nombre', 'salas_piezas.cantidad', 'piezas.id_pieza')
-        ->where('salas_piezas.id_sala', $id_sala)
-        ->get();        
+            ->join('piezas', 'salas_piezas.id_pieza', '=', 'piezas.id_pieza')
+            ->select('salas_piezas.id_relacion', 'piezas.codigo', 'piezas.nombre', 'salas_piezas.cantidad', 'piezas.id_pieza')
+            ->where('salas_piezas.id_sala', $id_sala)
+            ->get();
     }
 
     public function getPiezasBySala(Request $request)
@@ -232,9 +245,9 @@ class SalasController extends Controller
         $id_sala = $request->id_sala;
         $piezas = $this->obtenerPiezas($id_sala);
 
-        if($piezas->isEmpty()) {
+        if ($piezas->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'No se encontraron piezas para esta sala.']);
-        }else{
+        } else {
             return response()->json(['success' => true, 'data' => $piezas]);
         }
     }
@@ -282,7 +295,7 @@ class SalasController extends Controller
         $id_relacion = $request->id_relacion;
         $cantidad = $request->cantidad;
 
-        if(empty($cantidad) || !is_numeric($cantidad) || $cantidad <= 0) {
+        if (empty($cantidad) || !is_numeric($cantidad) || $cantidad <= 0) {
             return response()->json(['success' => false, 'message' => 'La cantidad debe ser un número mayor a 0.']);
         }
 
@@ -312,11 +325,11 @@ class SalasController extends Controller
             ->get()
             ->map(function ($item) use ($id_trabajador) {
                 $disponibilidad = (new \App\Services\SalasServices())->disSalasByTrabajador($item->id, $id_trabajador);
-                
+
                 return [
                     'id' => $item->id,
                     'text' => $item->codigo . ' - ' . $item->nombre,
-                    'disponibilidad' => $disponibilidad, 
+                    'disponibilidad' => $disponibilidad,
                 ];
             })
             ->values();
@@ -337,11 +350,11 @@ class SalasController extends Controller
             ->get()
             ->map(function ($item) {
                 $disponibilidad = (new \App\Services\SalasServices())->disSalasTraslado($item->id);
-                
+
                 return [
                     'id' => $item->id,
                     'text' => $item->codigo . ' - ' . $item->nombre,
-                    'disponibilidad' => $disponibilidad, 
+                    'disponibilidad' => $disponibilidad,
                 ];
             })
             ->values();
@@ -349,5 +362,32 @@ class SalasController extends Controller
         return response()->json($salas);
     }
 
+    public function getSalasDisponiblesTapizado(Request $request)
+    {
+        $term = $request->val;
+        $salas = DB::table('salas')
+            ->select('id_salas as id', 'codigo', 'nombre', 'precio_venta', 'costo_cacastero', 'costo_tapicero')
+            ->where(function ($query) use ($term) {
+                $query->where('codigo', 'like', "%{$term}%")
+                    ->orWhere('nombre', 'like', "%{$term}%");
+            })
+            ->where('estado', 1)
+            ->get()
+            ->map(function ($item) {
+                $disponibilidad = (new \App\Services\SalasServices())->disSalasTapizado($item->id);
+
+                return [
+                    'id' => $item->id,
+                    'text' => $item->codigo . ' - ' . $item->nombre,
+                    'disponibilidad' => $disponibilidad,
+                    'precio_venta' => $item->precio_venta,
+                    'costo_cacastero' => $item->costo_cacastero,
+                    'costo_tapicero' => $item->costo_tapicero,
+                ];
+            })
+            ->values();
+
+        return response()->json($salas);
+    }
 
 }
